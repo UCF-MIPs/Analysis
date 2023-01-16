@@ -1,0 +1,12 @@
+static-analysis/data/*
+static-analysis/results/*
+static-analysis/old_results/*
+static-analysis/__pycache__
+static-analysis-TE-check/data/*
+static-analysis-TE-check/raw_data/*
+static-analysis-TE-check/results/*
+static-analysis-TE-check/__pycache__
+UFTM-classification/results/*
+UFTM-classification/data/*
+UFTM-classification/resources/*
+UFTM-classification/__pycache__
