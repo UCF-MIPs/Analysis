@@ -5,6 +5,7 @@ import os
 #   Script to generate trustworthiness/popularity table for news sources
 
 #   ### Functions ###
+#TODO move to separate files
 
 def mean_normalize(df, column_name):
     existing_range = df[column_name].max()-df[column_name].min()
@@ -83,7 +84,7 @@ new_csv_filename = "news_table-v2-UT60-FM5.csv"
 #   ### User input ###
 
 # news data
-#news_filename   = "news_outlets.xlsx"
+news_filename   = "news_outlets.xlsx"
 pop_filename    = "majestic_million.csv"
 trust_filename  = "NewsGuard-metadata-2022090100.csv"
 trust_cutoff    = 60
@@ -91,8 +92,8 @@ pop_cutoff      = 5
 
 #   ### Create dataframes ###
 
-#news_data_path  = os.path.join(data_dir + "/" + news_filename)
-#news_df         = pd.read_excel(news_data_path)
+news_data_path  = os.path.join(data_dir + "/" + news_filename)
+news_df         = pd.read_excel(news_data_path)
 pop_data_path   = os.path.join(data_dir + "/" + pop_filename)
 pop_df          = pd.read_csv(pop_data_path)
 trust_data_path = os.path.join(data_dir + "/" + trust_filename)
@@ -106,7 +107,8 @@ if __name__ == '__main__':
     print("Pre-Processing - merging URL list and Majestic Million")
     # Join Majestic Million data to URL list
     # rename URL list column name to match majestic millions column name
-    #news_df.rename(columns = {'news outlets':'Domain'}, inplace=True)
+    news_df.rename(columns = {'news outlets':'Domain'}, inplace=True)
+    
     #rename column in pop_df
     pop_df.rename(columns = {'RefSubNets':'pop_score'}, inplace=True)
     # left join URL list and majestic million (popularity scores)
@@ -123,7 +125,8 @@ if __name__ == '__main__':
     trust_df.rename(columns = {'Score':'trust_score'}, inplace=True)
     # left join final_df and trust scores
     final_df = pd.merge(final_df, trust_df, on='Domain', how='left')
-    
+    final_df = pd.merge(news_df, final_df, on='Domain', how='left')
+
 
     print("Normalizing columns")
     final_df = cutoff(final_df, 'pop_score')
