@@ -193,11 +193,62 @@ def plot_path_lengths(lengths, edge_type, te_thresh, paths_dir):
 
 
 
-def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors):
+def remove_edges_from_list(edge_list, edges):
+    for i in range(len(edges)):
+        edge_list.remove(edges[i])
+
+'''
+def layer_edges(edge_list, root):
+    final_edge_list = []
+    layer=1
+    edges_from_root = [i for i in edge_list if i[0]==root]
+    #print(edges_from_root)
+    for i in range(len(edges_from_root)):
+        final_edge_list.append(edges_from_root[i])
+    remove_edges_from_list(edge_list,edges_from_root)
+    #print(edge_list)
+    layered_edge_list = [edges_from_root]
+    to_list = [i[1] for i in edges_from_root]
+    while(len(edge_list)>0):
+        layer += 1
+        next_layer = [e for e in edge_list if e[0] is in to_list]
+        remove_edges_from_list(edge_list, next_layer)
+        previous_from = [i[0] for i in final_edge_list]
+        backward_edges = [i for i in next_layer if i[1] is in previous_from]
+        if(backward_edges):
+            remove_edges_from_list(next_layer, backward_edges)
+        to_list = [i[1] for i in next_layer]
+    print(final_edge_list)
+'''     
+
+'''
+def remove_jump_edges(graph, root):
+    layer=1
+    edges = graph.edges
+    edges_from_root = [i for i in edge_list if i[0]==root]
+    remove_edges_from_list(edges, edges_from_root)
+    to_list = [i[1] for i in edges_from_root]
+    while(len(graph.edges)>0):
+        layer+=1
+        
+
+    return graph
+'''
+
+
+def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim):
     for root, graph in graphs.items():
         if not graph.has_node(root):
             return
-        tree = nx.bfs_tree(graph, root)
+        
+        tree_edges = list(graph.edges)
+        #tree_edges = layer_edges(tree_edges, root)
+
+        #tree = remove_jump_edges(graph, root)
+        
+        tree, actors = bfs_tree_AB(G=graph, source=root, actors=actors, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
+
+
         #tree = bfs_tree(graph, root)
         nx.relabel_nodes(tree,actors,copy=False)
         nx.relabel_nodes(graph,actors,copy=False)
@@ -213,125 +264,14 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors):
         #nx.draw(tree,pos, node_color=colormap, with_labels=True)
         nx.draw(tree,pos, node_color=colormap, with_labels=True, font_size=16, node_size=450)
         #TODO - fix node_type = ['Continued', 'Terminal']
-        plt.figure(3,figsize=(17,12))
-        #TODO fix: plt.legend(handles = node_type, loc = 'lower left')
-        plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root) + '-tree.jpg'))
-        plt.clf()
-
-
-def plot_htrees_NEW(graphs, tree_dir, edge_type,te_thresh, actors):
-    for root, graph in graphs.items():
-        if not graph.has_node(root):
-            return
-
-        #TESTS
-        '''    
-        #ADDED
-        print("ROOT - GRAPH")
-        print(str(root) + "\n") 
-        print(list(graph))
-
-        graph1 = nx.bfs_edges(graph, root, depth_limit=7)
-        print("BFS_EDGES")
-        print(list(graph1))
-        print("\n")
-
-        tree = nx.bfs_tree(graph, root)
-        print("BFS_TREE")
-        print(list(tree))
-        '''
-
-
-        #pos = graphviz_layout(graph1, prog='dot', args="-Grankdir=LR")
-        #nx.draw(graph1,pos, node_color=colormap, with_labels=True, font_size=16, node_size=450)
-        #nx.draw(graph1)
-        #plt.savefig("test.jpg")
-        '''
-        tree = nx.bfs_tree(graph1, root)
-        #tree = bfs_tree(graph, root)
-        nx.relabel_nodes(tree,actors,copy=False)
-        nx.relabel_nodes(graph,actors,copy=False)
-        colormap = []
-        for node in tree:
-            if graph.out_degree(node)==0:    
-                colormap.append('green')
-            else: 
-                colormap.append('#1f78b4')
-        pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-        nx.draw(tree,pos, node_color=colormap, with_labels=True, font_size=16, node_size=450)
-        #TODO - fix node_type = ['Continued', 'Terminal']
-        plt.figure(3,figsize=(17,12))
-        #TODO fix: plt.legend(handles = node_type, loc = 'lower left')
-        plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root) + '-tree.jpg'))
-        plt.clf()
-        '''
-
-def plot_htrees_NEW2(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim):
-    for root, graph in graphs.items():
-        if not graph.has_node(root):
-            return
-        tree, actors = bfs_tree_AB(G=graph, source=root, actors=actors, visited_lim=visited_lim, depth_lim = depth_lim)
-        #tree = bfs_tree(graph, root)
-        nx.relabel_nodes(tree,actors,copy=False)
-        nx.relabel_nodes(graph,actors,copy=False)
-        #tree = nx.dfs_tree(graph, root)
-        colormap = []
-        for node in tree:
-            #if tree.out_degree(node)==0:
-            if graph.out_degree(node)==0:    
-                colormap.append('green')
-            else: 
-                colormap.append('#1f78b4')
-        pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-        #nx.draw(tree,pos, node_color=colormap, with_labels=True)
-        nx.draw(tree,pos, node_color=colormap, with_labels=True, font_size=16, node_size=450)
-        #TODO - fix node_type = ['Continued', 'Terminal']
-        plt.figure(3,figsize=(17,12))
+        plt.figure(3,figsize=(17,50))
         #TODO fix: plt.legend(handles = node_type, loc = 'lower left')
         plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root) + '-tree.jpg'))
         plt.clf()
 
 
 
-
-
-def te_rollout(in_roots, in_edges_df, max_visits=1): 
-    lengths = {}
-    te_levels_df = {}
-    all_root_dfs = {}
-    for in_root in in_roots:
-        visited = {}
-        root_df = pd.DataFrame()
-        for node in range(150):
-            visited.update({node:0})
-        this_level_nodes = in_root
-        te_values = []
-        this_level = 0
-        while True:
-            if(this_level==0):
-                this_level_nodes = [this_level_nodes]
-            last_visited = visited.copy()
-            for node in this_level_nodes:
-                visited[node] += 1
-            if(last_visited == visited):
-                lengths.update({in_root:this_level})
-                break
-            this_level += 1
-            edges_from_this_level = in_edges_df[in_edges_df['Source'].isin(this_level_nodes)]
-            visited_cap = set([k for k, v in visited.items() if v > max_visits])
-            e = edges_from_this_level[~edges_from_this_level['Target'].isin(visited_cap)]
-            root_df = root_df.append(e, ignore_index=True)
-            this_level_nodes = set(edges_from_this_level['Target'].to_list()).difference(visited_cap)
-
-        all_root_dfs.update({in_root:root_df})
-    
-    return lengths, all_root_dfs
-
-
-
-# Same as above, but trying to make visited condition layer=based
-# Need to fix corresponding plotting function
-def te_rollout_NEW(in_roots, in_edges_df, max_visits=6): 
+def te_rollout(in_roots, in_edges_df, max_visits=6): 
     lengths = {}
     te_levels_df = {}
     all_root_dfs = {}
@@ -363,12 +303,75 @@ def te_rollout_NEW(in_roots, in_edges_df, max_visits=6):
         all_root_dfs.update({in_root:root_df})
     
     return lengths, all_root_dfs
+
+
+def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
+    # number of added nodes
+    n=0
+    lengths = {}
+    te_levels_df = {}
+    all_root_dfs = {}
+    for in_root in in_roots:
+        visited = {}
+        root_df = pd.DataFrame()
+        for node in range(1000):
+            visited.update({node:0})
+        this_level_nodes = in_root
+        te_values = []
+        this_level = 0
+        while True:
+            if(this_level==0):
+                this_level_nodes = [this_level_nodes]
+            last_visited = visited.copy()
+            for node in this_level_nodes:
+                visited[node] += 1
+            if(last_visited == visited):
+                lengths.update({in_root:this_level})
+                break
+            this_level += 1
+            #edges_from_this_level = in_edges_df[in_edges_df['Source'].isin(this_level_nodes)]
+            e = in_edges_df[in_edges_df['Source'].isin(this_level_nodes)]
+            #print(e) 
+            # Replace edge to visited node with new edge to new terminal node with same ID
+            for index, edge in e.iterrows():
+                #print(edge)
+                from_node = edge['Source']
+                to_node = edge['Target']
+                if visited[to_node]>0:
+
+                    #add new edge to new node with same outgoing actor ID
+                    new_node = 101 + n
+                    n+=1
+                    actor_name = actors[to_node]
+                    node = {new_node:actor_name}
+
+                    nodepos = ((e['Source']==from_node) & (e['Target']==to_node))
+                    e.loc[nodepos, ['Target']]=new_node
+                    #print(e.loc[nodepos])
+                    #print(actors)
+                    # actors.append
+                    
+                    #somehow assign a new color/shape
+            #print(e)
+            visited_cap = set([k for k, v in visited.items() if v > max_visits])
+            #e = edges_from_this_level[~edges_from_this_level['Target'].isin(visited_cap)]
+            e = e[~e['Target'].isin(visited_cap)]
+
+           
+            root_df = root_df.append(e, ignore_index=True)
+            #this_level_nodes = set(edges_from_this_level['Target'].to_list()).difference(visited_cap)
+            this_level_nodes = set(e['Target'].to_list()).difference(visited_cap)
+            #this_level_nodes = e['Target'].to_list()
+        all_root_dfs.update({in_root:root_df})
+    
+    return lengths, all_root_dfs
+
 
 
 
 # OVERRIDES
 
-def bfs_tree_AB(G, source, actors, visited_lim, depth_lim, reverse=False, depth_limit=None, sort_neighbors=None):
+def bfs_tree_AB(G, source, actors, visited_lim, depth_lim, reverse=False, depth_limit=None, sort_neighbors=None, edges=None):
     T = nx.DiGraph()
     T.add_node(source)
     edges_gen = bfs_edges_AB(
@@ -381,8 +384,13 @@ def bfs_tree_AB(G, source, actors, visited_lim, depth_lim, reverse=False, depth_
         depth_limit=depth_limit,
         sort_neighbors=sort_neighbors,
     )
-
-    T.add_edges_from(edges_gen)
+    #print(list(edges_gen)) THIS BREAKS THINGS
+    #TODO
+    # Only include edges from one layer to next
+    # Maybe just do something like...
+    # edges_gen = edges from te_rollout
+    #T.add_edges_from(edges_gen)
+    T.add_edges_from(edges)
     return T, actors
 
 
