@@ -4,7 +4,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from util import plot_graphs, plot_betweenness_centrality, plot_degree, te_rollout, te_rollout_addnodes, plot_path_lengths, plot_htrees
 import csv
-#import 
 
 # Directories
 degree_dir      = 'results/te-network-degree/' 
@@ -35,6 +34,7 @@ cascade_df = graph_df.loc[(graph_df['Target'] > 0.) & (graph_df['Source']<101.) 
 #actor_df = pd.read_csv('data/v4/actors.csv')
 actor_df = pd.read_csv('data/dynamic/actors.csv')
 actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
+actors_orig = actors
 
 # Capture all edge types
 from_edges = ['UF', 'UM', 'TF', 'TM']
@@ -82,36 +82,29 @@ if __name__ == "__main__":
             cascade_df = graph_df.loc[(graph_df[edge_type] > te_thresh) & \
                                         (graph_df['Target'] > 0.) & (graph_df['Source']<101.) & (graph_df['Target']<101.)]
             
-            '''
-            # root nodes are those without incoming edges
-            root_nodes = []
-            all_nodes = cascade_df['Source'].unique()
-            #print("len all nodes", len(all_nodes))
-            present_in_targ = cascade_df['Target'].unique()
-            root_nodes = list(set(all_nodes) -  set(present_in_targ))
-            '''
             # root nodes are those identified previously as most influential.
             # In the dynamic v4, these nodes are 12, 84, 23
             root_nodes = [12, 84, 23]
             #lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim)
             lengths, all_root_dfs = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
-            for i in all_root_dfs[12]['Target']:
-                print(i)
             #plot_path_lengths(lengths = lengths, edge_type = edge_type, \
             #        te_thresh = te_thresh, paths_dir = paths_dir)
             # Graph/tree plotting of paths from root
             root_graphs = {}
-            #print(all_root_dfs)
             for roots, root_df in all_root_dfs.items():
-                #print(root_df)
                 g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 root_graphs.update({roots:g})
               
             #print(root_graphs[12].edges)
             plot_htrees(root_graphs, tree_dir, edge_type, te_thresh, actors, vis_lim, dep_lim)
+
+
+            # Have to redo subgraph generation without added nodes for tree viz
+            #lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors_orig)
+            #root_graphs = {}
+            #print(all_root_dfs)
+            for roots, root_df in all_root_dfs.items():
+                g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
+                root_graphs.update({roots:g})
             #plot_graphs(root_graphs, paths_dir)
             
-
-
-
-

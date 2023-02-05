@@ -190,52 +190,6 @@ def plot_path_lengths(lengths, edge_type, te_thresh, paths_dir):
     plt.clf() 
 
 
-
-
-
-def remove_edges_from_list(edge_list, edges):
-    for i in range(len(edges)):
-        edge_list.remove(edges[i])
-
-'''
-def layer_edges(edge_list, root):
-    final_edge_list = []
-    layer=1
-    edges_from_root = [i for i in edge_list if i[0]==root]
-    #print(edges_from_root)
-    for i in range(len(edges_from_root)):
-        final_edge_list.append(edges_from_root[i])
-    remove_edges_from_list(edge_list,edges_from_root)
-    #print(edge_list)
-    layered_edge_list = [edges_from_root]
-    to_list = [i[1] for i in edges_from_root]
-    while(len(edge_list)>0):
-        layer += 1
-        next_layer = [e for e in edge_list if e[0] is in to_list]
-        remove_edges_from_list(edge_list, next_layer)
-        previous_from = [i[0] for i in final_edge_list]
-        backward_edges = [i for i in next_layer if i[1] is in previous_from]
-        if(backward_edges):
-            remove_edges_from_list(next_layer, backward_edges)
-        to_list = [i[1] for i in next_layer]
-    print(final_edge_list)
-'''     
-
-'''
-def remove_jump_edges(graph, root):
-    layer=1
-    edges = graph.edges
-    edges_from_root = [i for i in edge_list if i[0]==root]
-    remove_edges_from_list(edges, edges_from_root)
-    to_list = [i[1] for i in edges_from_root]
-    while(len(graph.edges)>0):
-        layer+=1
-        
-
-    return graph
-'''
-
-
 def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim):
     for root, graph in graphs.items():
         if not graph.has_node(root):
@@ -365,7 +319,6 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
         all_root_dfs.update({in_root:root_df})
     
     return lengths, all_root_dfs
-
 
 
 
