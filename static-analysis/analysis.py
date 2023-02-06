@@ -40,7 +40,7 @@ actors_orig = actors
 from_edges = ['UF', 'UM', 'TF', 'TM']
 to_edges   = ['UF', 'UM', 'TF', 'TM']
 
-edge_types = ['total_te']
+edge_types = ['total_te','total_te']
 for i in from_edges:
     for j in to_edges:
         edge_types.append(str(i + '_' + j))
@@ -68,16 +68,13 @@ if __name__ == "__main__":
             thresh = te_thresh
 
         # Plotting functions
-        #plot_degree(g, thresh, edge_type, degree_dir, degree_diff_dir)
-        #plot_betweenness_centrality(g, thresh, edge_type, centrality_dir)
+        plot_degree(g, thresh, edge_type, degree_dir, degree_diff_dir)
+        plot_betweenness_centrality(g, thresh, edge_type, centrality_dir)
 
     ##### Pathways analysis #####
-    #for edge_type in ['UM_UM', 'TM_TM', 'total_te','UM_UM', 'UF_TM','UM_TM']:
-    #for edge_type in edge_types:
-    for edge_type in ['TM_TM', 'TM_TM', 'UM_TM', 'total_te']: #duplicate initial to fix blank plot problem...
-        #for te_thresh in [0.1, 0.2, 0.3]:
-        for te_thresh in [0.1, 0.2, 0.3, 0.4]:
-            # Select TE network, choosing total TE > 0.1
+    #for edge_type in ['TM_TM', 'TM_TM', 'UM_TM', 'total_te']: #duplicate initial to fix blank plot problem...
+    for edge_type in edge_types:
+        for te_thresh in [0.1, 0.2, 0.3, 0.4, 0.5]:
             #TODO delete the extra communitty exlusion (2nd time it appears)
             cascade_df = graph_df.loc[(graph_df[edge_type] > te_thresh) & \
                                         (graph_df['Target'] > 1.) & (graph_df['Source']<101.) & (graph_df['Target']<101.)]
@@ -85,26 +82,22 @@ if __name__ == "__main__":
             # root nodes are those identified previously as most influential.
             # In the dynamic v4, these nodes are 12, 84, 23
             root_nodes = [12, 84, 23]
-            #lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim)
             lengths, all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
-            #plot_path_lengths(lengths = lengths, edge_type = edge_type, \
-            #        te_thresh = te_thresh, paths_dir = paths_dir)
+            plot_path_lengths(lengths = lengths, edge_type = edge_type, te_thresh = te_thresh, paths_dir = paths_dir)
+            
             # Graph/tree plotting of paths from root
             root_graphs = {}
             for roots, root_df in all_root_dfs.items():
                 g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 root_graphs.update({roots:g})
               
-            #print(root_graphs[12].edges)
             plot_htrees(root_graphs, tree_dir, edge_type, te_thresh, actors, vis_lim, dep_lim)
 
-
             # Have to redo subgraph generation without added nodes for tree viz
-            #lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors_orig)
-            #root_graphs = {}
-            #print(all_root_dfs)
+            lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim)
+            root_graphs = {}
             for roots, root_df in all_root_dfs.items():
                 g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 root_graphs.update({roots:g})
-            #plot_graphs(root_graphs, paths_dir)
+            plot_graphs(root_graphs, graphs_dir, actors = actors_orig, edge_type=edge_type, te_val = te_thresh)
             

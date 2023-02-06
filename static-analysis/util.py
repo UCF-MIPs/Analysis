@@ -153,15 +153,16 @@ def plot_longest_path(graphs, longest_path_dir):
     plt.bar(path[0],path[1])
     plt.savefig('longest_paths.jpg')
 
-def plot_graphs(graphs, graphs_dir, plot_type=None):
+def plot_graphs(graphs, graphs_dir, actors, edge_type, te_val, plot_type=None):
     for edge_type, graph in graphs.items():
+        nx.relabel_nodes(graph,actors,copy=False)
         if(plot_type):
             #pos=nx.spring_layout(graph)
             #nx.draw(graph,pos)
             nx.draw_circular(graph,with_labels=True)
         else:
             nx.draw(graph)
-        plt.savefig(str(graphs_dir + edge_type + '-graph.jpg'))
+        plt.savefig(str(graphs_dir + str(edge_type) + 'te-' + str(te_val) + '-graph.jpg'))
         plt.clf()
 
 
@@ -254,18 +255,18 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
                 colormap_nodes.append('#1f78b4')
 
         pathway = strongest_path(tree,graph,root)
-        print(pathway)
+        #print(pathway)
         colormap_edges = []
         for edge in tree.edges:
-            print(edge)
+            #print(edge)
             if edge in pathway:
                 colormap_edges.append('red')
             else:
                 colormap_edges.append('black')
         
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-        #nx.draw(tree, pos, node_color=colormap_nodes, with_labels=True, font_size=16, node_size=450)
         nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450)
+        #nx.draw_networkx(tree,  pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450)
         plt.figure(3,figsize=(17,50))
         #TODO - fix node_type = ['Continued', 'Terminal', 'Unexpanded, not terminal']
         # fix: plt.legend(handles = node_type, loc = 'lower left')
@@ -332,42 +333,23 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
                 lengths.update({in_root:this_level})
                 break
             this_level += 1
-            #edges_from_this_level = in_edges_df[in_edges_df['Source'].isin(this_level_nodes)]
             e = in_edges_df[in_edges_df['Source'].isin(this_level_nodes)]
-            #print(e) 
             # Replace edge to visited node with new edge to new terminal node with same ID
             for index, edge in e.iterrows():
-                #print(edge)
                 from_node = edge['Source']
                 to_node = edge['Target']
                 if visited[to_node]>0:
-
                     #add new edge to new node with same outgoing actor ID
                     new_node = 120 + n
                     n+=1
                     actor_name = actors[to_node]
-                    
-
-                    #actors[new_node] = str(actor_name + '_NE') # for not expanded #TODO THIS LINE BREAKS LAYER EDGES
-
-
+                    actors[new_node] = str(actor_name + '_NE_' + str(n)) 
                     nodepos = ((e['Source']==from_node) & (e['Target']==to_node))
                     e.loc[nodepos, ['Target']]=new_node
-                    #print(e.loc[nodepos])
-                    #print(actors)
-                    # actors.append
-                    
-                    #somehow assign a new color/shape
-            #print(e)
             visited_cap = set([k for k, v in visited.items() if v > max_visits])
-            #e = edges_from_this_level[~edges_from_this_level['Target'].isin(visited_cap)]
             e = e[~e['Target'].isin(visited_cap)]
-
-           
             root_df = root_df.append(e, ignore_index=True)
-            #this_level_nodes = set(edges_from_this_level['Target'].to_list()).difference(visited_cap)
             this_level_nodes = set(e['Target'].to_list()).difference(visited_cap)
-            #this_level_nodes = e['Target'].to_list()
         all_root_dfs.update({in_root:root_df})
     
     return lengths, all_root_dfs, actors
