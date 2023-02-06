@@ -243,6 +243,7 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
         nx.relabel_nodes(tree,actors,copy=False)
         nx.relabel_nodes(graph,actors,copy=False)
+        root_orig = root
         root = actors[root]
         colormap_nodes = []
         for node in tree:
@@ -252,26 +253,23 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
             else: 
                 colormap_nodes.append('#1f78b4')
 
-        # Color edges in strongest TE path
-        #p = tree.get_edge_data(12,7)
-        #print("weight:", p)
-
         pathway = strongest_path(tree,graph,root)
         print(pathway)
+        colormap_edges = []
+        for edge in tree.edges:
+            print(edge)
+            if edge in pathway:
+                colormap_edges.append('red')
+            else:
+                colormap_edges.append('black')
+        
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-        nx.draw(tree, pos, node_color=colormap_nodes, with_labels=True, font_size=16, node_size=450)
-        #nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, font_size=16, node_size=450)
+        #nx.draw(tree, pos, node_color=colormap_nodes, with_labels=True, font_size=16, node_size=450)
+        nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450)
         plt.figure(3,figsize=(17,50))
         #TODO - fix node_type = ['Continued', 'Terminal', 'Unexpanded, not terminal']
         # fix: plt.legend(handles = node_type, loc = 'lower left')
-        # TODO Print weight labels on edges
-        #weight_labels = nx.get_edge_attributes(tree,'weight')
-        #nx.draw_networkx_edge_labels(tree,pos,edge_labels=weight_labels)
-        #nx.draw_networkx_edge_labels(graph,
-        #                     pos,
-        #                     edge_labels={(u, v): d for u, v, d in graph.edges(data="weight")},
-        #                     label_pos=.66)
-        plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root) + '-tree.jpg'))
+        plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root_orig) + '-tree.jpg'))
         plt.clf()
 
 
@@ -351,7 +349,6 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
                     
 
                     #actors[new_node] = str(actor_name + '_NE') # for not expanded #TODO THIS LINE BREAKS LAYER EDGES
-                    #print(actors)
 
 
                     nodepos = ((e['Source']==from_node) & (e['Target']==to_node))

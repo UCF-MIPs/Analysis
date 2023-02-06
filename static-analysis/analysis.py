@@ -74,9 +74,9 @@ if __name__ == "__main__":
     ##### Pathways analysis #####
     #for edge_type in ['UM_UM', 'TM_TM', 'total_te','UM_UM', 'UF_TM','UM_TM']:
     #for edge_type in edge_types:
-    for edge_type in ['TM_TM']: #duplicate initial to fix blank plot problem...
+    for edge_type in ['TM_TM', 'TM_TM', 'UM_TM', 'total_te']: #duplicate initial to fix blank plot problem...
         #for te_thresh in [0.1, 0.2, 0.3]:
-        for te_thresh in [0.1]:
+        for te_thresh in [0.1, 0.2, 0.3, 0.4]:
             # Select TE network, choosing total TE > 0.1
             #TODO delete the extra communitty exlusion (2nd time it appears)
             cascade_df = graph_df.loc[(graph_df[edge_type] > te_thresh) & \
