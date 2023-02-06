@@ -55,7 +55,7 @@ out_deg_centrality = []
 if __name__ == "__main__":
     for edge_type in edge_types:
         # Filter for TE edges above threshold value
-        graph_df1 = graph_df.loc[(graph_df[edge_type] > te_thresh) & (graph_df['Target'] > 0.)& (graph_df['Source']<101.) & (graph_df['Target']<101.)]
+        graph_df1 = graph_df.loc[(graph_df[edge_type] > te_thresh) & (graph_df['Target'] > 1.)& (graph_df['Source']<101.) & (graph_df['Target']<101.)]
         g = nx.from_pandas_edgelist(graph_df1, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
 
         # Collect generated graphs labeled by edge types (UFTM classifications)
@@ -74,19 +74,19 @@ if __name__ == "__main__":
     ##### Pathways analysis #####
     #for edge_type in ['UM_UM', 'TM_TM', 'total_te','UM_UM', 'UF_TM','UM_TM']:
     #for edge_type in edge_types:
-    for edge_type in ['TM_TM','TM_TM']:
+    for edge_type in ['TM_TM']: #duplicate initial to fix blank plot problem...
         #for te_thresh in [0.1, 0.2, 0.3]:
         for te_thresh in [0.1]:
             # Select TE network, choosing total TE > 0.1
             #TODO delete the extra communitty exlusion (2nd time it appears)
             cascade_df = graph_df.loc[(graph_df[edge_type] > te_thresh) & \
-                                        (graph_df['Target'] > 0.) & (graph_df['Source']<101.) & (graph_df['Target']<101.)]
+                                        (graph_df['Target'] > 1.) & (graph_df['Source']<101.) & (graph_df['Target']<101.)]
             
             # root nodes are those identified previously as most influential.
             # In the dynamic v4, these nodes are 12, 84, 23
             root_nodes = [12, 84, 23]
             #lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim)
-            lengths, all_root_dfs = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
+            lengths, all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
             #plot_path_lengths(lengths = lengths, edge_type = edge_type, \
             #        te_thresh = te_thresh, paths_dir = paths_dir)
             # Graph/tree plotting of paths from root
