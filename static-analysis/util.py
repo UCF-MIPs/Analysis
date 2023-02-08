@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import time
 from networkx.drawing.nx_agraph import graphviz_layout
 from collections import deque
+import matplotlib.lines as mlin
+from matplotlib.offsetbox import AnchoredText
 
 def plot_degree(g, te_thresh, edge_type, degree_dir, degree_diff_dir):
     '''
@@ -234,7 +236,7 @@ def strongest_path(tree,graph,root):
     return pathway
 
 
-def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim):
+def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim, orig_nodes):
     for root, graph in graphs.items():
 
         if not graph.has_node(root):
@@ -248,28 +250,42 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
         root = actors[root]
         colormap_nodes = []
         for node in tree:
-            #if tree.out_degree(node)==0:
-            if graph.out_degree(node)==0:    
-                colormap_nodes.append('green')
-            else: 
-                colormap_nodes.append('#1f78b4')
-
+            if(node in orig_nodes):
+                if graph.out_degree(node)==0:    
+                    colormap_nodes.append('green')
+                else: 
+                    colormap_nodes.append('#1f78b4')
+            elif(node not in orig_nodes):
+                    colormap_nodes.append('yellow')
         pathway = strongest_path(tree,graph,root)
         #print(pathway)
         colormap_edges = []
         for edge in tree.edges:
-            #print(edge)
-            if edge in pathway:
+            if(edge in pathway):
                 colormap_edges.append('red')
             else:
                 colormap_edges.append('black')
-        
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
         nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450)
-        #nx.draw_networkx(tree,  pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450)
+        #short
+        #plt.figure(3,figsize=(17,17))
+        #tall
         plt.figure(3,figsize=(17,50))
-        #TODO - fix node_type = ['Continued', 'Terminal', 'Unexpanded, not terminal']
-        # fix: plt.legend(handles = node_type, loc = 'lower left')
+        node_type = ['Expanded', 'Terminal', 'Unexpanded']
+        #plt.legend(handles = node_type, loc = 'lower left')
+        te_text = str('TE threshold: ' + str(te_thresh))
+        text_box = AnchoredText(te_text, frameon=True, loc='lower left', pad=0.5)
+        plt.setp(text_box.patch, facecolor='white', alpha=0.5)
+        plt.gca().add_artist(text_box)
+        te_text2 = str('Influence type: ' + '\n' + str(edge_type))
+        text_box2 = AnchoredText(te_text2, frameon=True, loc='lower center', pad=0.5)
+        plt.gca().add_artist(text_box2)
+
+        #https://stackoverflow.com/questions/11423369/matplotlib-legend-circle-markers
+        line1 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="#1f75ae")
+        line2 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="green")
+        line3 = mlin.Line2D([], [], color="white", marker='o', markersize=15,  markerfacecolor="yellow")
+        plt.legend((line1, line2, line3), ('Expanded', 'Terminal', 'Unexpanded'), numpoints=1, loc='lower right')
         plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root_orig) + '-tree.jpg'))
         plt.clf()
 
@@ -343,7 +359,7 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
                     new_node = 120 + n
                     n+=1
                     actor_name = actors[to_node]
-                    actors[new_node] = str(actor_name + '_NE_' + str(n)) 
+                    actors[new_node] = str(actor_name + '_' + str(n)) 
                     nodepos = ((e['Source']==from_node) & (e['Target']==to_node))
                     e.loc[nodepos, ['Target']]=new_node
             visited_cap = set([k for k, v in visited.items() if v > max_visits])
