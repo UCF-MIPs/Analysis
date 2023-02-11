@@ -88,6 +88,8 @@ if __name__ == "__main__":
             # root nodes are those identified previously as most influential.
             # In the dynamic v4, these nodes are 12, 84, 23
             root_nodes = [12, 84, 23]
+            # Find root node number based on actor name
+            #root_nodes = {i for i in actors if actors[i]=='Ian56789'}
             lengths, all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
             plot_path_lengths(lengths = lengths, edge_type = edge_type, te_thresh = te_thresh, paths_dir = paths_dir)
             
@@ -95,6 +97,7 @@ if __name__ == "__main__":
             root_graphs = {}
             for roots, root_df in all_root_dfs.items():
                 g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
+                #print("Root: ", roots, " infl type: ", edge_type, " thresh: ", te_thresh, " num_nodes", g.number_of_nodes())
                 root_graphs.update({roots:g})
               
             plot_htrees(root_graphs, tree_dir, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes)
