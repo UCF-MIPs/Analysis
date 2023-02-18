@@ -18,7 +18,8 @@ def plot_degree(g, te_thresh, edge_type, degree_dir, degree_diff_dir):
     TE weighted degree difference
     '''
     # threshold value text for plots
-    textstr = str('TE-threshold = '+str(te_thresh))
+    #textstr = str('TE-threshold = '+str(te_thresh))
+    textstr = str(f"TE-threshold = {te_thresh}")
     
     #number of unique nodes
     num_nodes = g.number_of_nodes()
@@ -27,18 +28,14 @@ def plot_degree(g, te_thresh, edge_type, degree_dir, degree_diff_dir):
     x = nx.degree(g)
     degree_values = [v for k, v in x]
     nodes = [k for k, v in x]
-    #te_weight = g[str(edge_type)]
-    #print(nodes)
-    #te_weights = 
-    #degree_values = degree_values * te_weight
     plt.hist(degree_values)
-    plt.title(str(edge_type + ' ' + 'degree'))
-    plt.ylabel('number of nodes')
-    plt.xlabel('degree')
+    #plt.title(str(edge_type + ' ' + 'degree'))
+    plt.title(f"{edge_type} degree")
+    plt.ylabel('number of nodes'); plt.xlabel('degree')
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.xlim([-50,50])
-    plt.ylim([0,80])
-    plt.savefig(str(degree_dir + edge_type + '-degree.jpg'))
+    plt.xlim([-50,50]); plt.ylim([0,80])
+    #plt.savefig(str(degree_dir + edge_type + '-degree.jpg'))
+    plt.savefig(f"{degree_dir}{edge_type}-degree.jpg")
     plt.clf()
 
     ##### IN DEGREE #####
@@ -46,13 +43,13 @@ def plot_degree(g, te_thresh, edge_type, degree_dir, degree_diff_dir):
     in_degree_values = [v for k, v in x_in]
     in_nodes = [k for k, v in x_in]
     plt.hist(in_degree_values)
-    plt.title(str(edge_type+' '+'in-degree'))
-    plt.ylabel('number of nodes')
-    plt.xlabel('degree')
-    plt.xlim([-50,50])
-    plt.ylim([0,80])
+    #plt.title(str(edge_type+' '+'in-degree'))
+    plt.title(f"{edge_type} degree")
+    plt.ylabel('number of nodes'); plt.xlabel('degree')
+    plt.xlim([-50,50]); plt.ylim([0,80])
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.savefig(str(degree_dir + edge_type + '-in-degree.jpg'))
+    #plt.savefig(str(degree_dir + edge_type + '-in-degree.jpg'))
+    plt.savefig(f"{degree_dir}{edge_type}-in-degree.jpg")
     plt.clf()
 
     ##### OUT DEGREE #####
@@ -65,13 +62,13 @@ def plot_degree(g, te_thresh, edge_type, degree_dir, degree_diff_dir):
     #    print("Out degree rank of UF-TM network")
     #    print(y)
     plt.hist(out_degree_values)
-    plt.title(str(edge_type + ' ' + 'out-degree'))
-    plt.ylabel('number of nodes')
-    plt.xlabel('degree')
-    plt.xlim([-50,50])
-    plt.ylim([0,80])
+    #plt.title(str(edge_type + ' ' + 'out-degree'))
+    plt.title(f"{edge_type} out-degree")
+    plt.ylabel('number of nodes'); plt.xlabel('degree')
+    plt.xlim([-50,50]); plt.ylim([0,80])
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.savefig(str(degree_dir + edge_type + '-out-degree.jpg'))
+    #plt.savefig(str(degree_dir + edge_type + '-out-degree.jpg'))
+    plt.savefig(f"{degree_dir}{edge_type}-out-degree.jpg")
     plt.clf()
 
     ##### DEGREE DIFFERENCE #####
@@ -85,22 +82,18 @@ def plot_degree(g, te_thresh, edge_type, degree_dir, degree_diff_dir):
         else:
             amp.append(0)    
     plt.hist(amp)
-    plt.title(str(edge_type + ' ' + 'degree difference (out - in)'))
+    #plt.title(str(edge_type + ' ' + 'degree difference (out - in)'))
+    plt.title(f"{edge_type} degree difference (out-in)")
     if(max(amp)>abs(min(amp))):
         amp_max = max(amp) +1
     elif(max(amp)<abs(min(amp))):
         amp_max = abs(min(amp)) +1
-    plt.ylabel('number of nodes')
-    plt.xlabel('outreach')
-    plt.xlim([-50,50])
-    plt.ylim([0,80])
+    plt.ylabel('number of nodes'); plt.xlabel('outreach')
+    plt.xlim([-50,50]); plt.ylim([0,80])
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.savefig(str(degree_diff_dir + edge_type+'-outreach'))
+    #plt.savefig(str(degree_diff_dir + edge_type+'-outreach'))
+    plt.savefig(f"{degree_diff_dir}{edge_type}-outreach")
     plt.clf()     
-
-    #TODO
-    # Weighted degree difference
-
 
 
 def plot_betweenness_centrality(g, te_thresh, edge_type, centrality_dir):
@@ -109,27 +102,20 @@ def plot_betweenness_centrality(g, te_thresh, edge_type, centrality_dir):
     node betweenness centrality
     edge betweenness centrality
     '''
-    # threshold value text for plots
-    textstr = str('TE-threshold = '+str(te_thresh))
-
-    # BETWEENNESS CENTRALITY FOR NODES
+    #textstr = str('TE-threshold = '+str(te_thresh))
+    textstr = f"TE-threshold = {te_thresh}"
+    
+    #BETWEENNESS CENTRALITY FOR NODES
     BC_nodes = nx.betweenness_centrality(g, normalized = True)
-
-    #print some values
-    #if(edge_type=='UF_TM'):
-    #    y = dict(sorted(BC_nodes.items(), key=lambda item: item[1]))
-    #    y = list(reversed(y))
-    #    print("Betweenness centrality rank of UF-TM TE network")
-    #    print(y)
-
     cent_node_values = BC_nodes.values()
     cent_nodes = BC_nodes.keys()
     plt.hist(cent_node_values,bins=20)
-    plt.title(str(edge_type + ' ' + 'node betweenness centrality'))
-    plt.ylabel('number of nodes')
-    plt.xlabel('centrality')
+    #plt.title(str(edge_type + ' ' + 'node betweenness centrality'))
+    plt.title(f"{edge_type} node betweenness centrality ")
+    plt.ylabel('number of nodes'); plt.xlabel('centrality')
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.savefig(str(centrality_dir + edge_type + '-nodes-centrality.jpg'))
+    #plt.savefig(str(centrality_dir + edge_type + '-nodes-centrality.jpg'))
+    plt.savefig(f"{centrality_dir}{edge_type}-nodes-centrality.jpg")
     plt.clf()
 
     # BETWEENNESS CENTRALITY FOR EDGES
@@ -140,11 +126,12 @@ def plot_betweenness_centrality(g, te_thresh, edge_type, centrality_dir):
     for c in cent_edges:
         cent_edges_list.append(str(c))
     plt.hist(cent_edge_values, bins=20)
-    plt.title(str(edge_type + ' ' + 'edge betweenness centrality'))
-    plt.ylabel('number of edges')
-    plt.xlabel('centrality')
+    #plt.title(str(edge_type + ' ' + 'edge betweenness centrality'))
+    plt.title(f"{edge_type} edge betweenness centrality")
+    plt.ylabel('number of edges'); plt.xlabel('centrality')
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.savefig(str(centrality_dir + edge_type +'-edges-centrality.jpg'))
+    #plt.savefig(str(centrality_dir + edge_type +'-edges-centrality.jpg'))
+    plt.savefig(f"{centrality_dir}{edge_type}-edges-centrality.jpg")
     plt.clf()
 
 def plot_longest_path(graphs, longest_path_dir):
@@ -164,9 +151,9 @@ def plot_graphs(graphs, graphs_dir, actors, edge_type, te_val, plot_type=None):
             nx.draw_circular(graph,with_labels=True)
         else:
             nx.draw(graph)
-        plt.savefig(str(graphs_dir + str(edge_type) + 'te-' + str(te_val) + '-graph.jpg'))
+        #plt.savefig(str(graphs_dir + str(edge_type) + 'te-' + str(te_val) + '-graph.jpg'))
+        plt.savefig(f"{graphs_dir}{edge_type}-te-{te_val}-graph.jpg")
         plt.clf()
-
 
 
 def plot_path_lengths(lengths, edge_type, te_thresh, paths_dir):
@@ -182,16 +169,16 @@ def plot_path_lengths(lengths, edge_type, te_thresh, paths_dir):
     root_nodes = [str(x) for x in root_nodes]
 
     plt.bar(x=root_nodes, height=path_length)
-    plt.xlabel("root nodes")
-    plt.ylabel("length")
-    plt.ylim([0,10])
+    plt.xlabel("root nodes"); plt.ylabel("length")
+    plt.ylim([0,10]) 
     plt.title(str(edge_type + " path lengths"  + " te_thresh=" + str(te_thresh))) 
-    textstr= str("te_thresh=" + str(te_thresh)) 
+    #textstr= str("te_thresh=" + str(te_thresh)) 
+    textstr= f"te_tresh={te_thresh}"
     plt.rcParams.update({'font.size': 26})
     plt.figtext(0.02, 0.02, textstr, fontsize=10)
-    plt.savefig(str(paths_dir + edge_type + "_te-" + str(te_thresh) + "_paths.jpg"))
+    #plt.savefig(str(paths_dir + edge_type + "_te-" + str(te_thresh) + "_paths.jpg"))
+    plt.savefig(f"{paths_dir}{edge_type}-te-{te_thresh}-paths.jpg")
     plt.clf() 
-
 
 
 def strongest_path(tree,graph,root):
@@ -201,21 +188,15 @@ def strongest_path(tree,graph,root):
     pathway = []
     # Get layers from tree
     edges_from_source = tree.out_edges(root)
-    #print(edges_from_source)
     out_edges = {}
     for i in edges_from_source:
-        #m,n = graph.get_edge_data(*i).items()
-        #print(list(graph.get_edge_data(*i).items()))
         n = list(graph.get_edge_data(*i).values())
         out_edges[i]=n
-    #print(out_edges)
     max_val = max(out_edges.values())
     selection = (k for k, v in out_edges.items() if v == max_val)
-    #print("selection",*selection)
     elem = [*selection]
     f,t = elem[0]
     pathway.append((f,t))
-    #print(pathway)
     in_node = t
     #traverse layers
     while(True):
@@ -231,17 +212,17 @@ def strongest_path(tree,graph,root):
         elem = [*selection]
         f,t = elem[0]
         pathway.append((f,t))
-        #print(pathway)
         in_node = t
     return pathway
 
 
 def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim, orig_nodes):
+    '''
+    horizontal trees/hierarchical directed graph propogation
+    '''
     for root, graph in graphs.items():
-
         if not graph.has_node(root):
             return
-        
         tree_edges = list(graph.edges)
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
         nx.relabel_nodes(tree,actors,copy=False)
@@ -258,7 +239,6 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
             elif(node not in orig_nodes):
                     colormap_nodes.append('yellow')
         pathway = strongest_path(tree,graph,root)
-        #print(pathway)
         colormap_edges = []
         for edge in tree.edges:
             if(edge in pathway):
@@ -266,13 +246,13 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
             else:
                 colormap_edges.append('black')
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-        nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450)
+        nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, \
+                with_labels=True, width=3, font_size=24, node_size=450)
         #short
-        #plt.figure(3,figsize=(17,17))
+        #plt.figure(3,figsize=(20,20))
         #tall
-        plt.figure(3,figsize=(17,50))
+        plt.figure(3,figsize=(18,50))
         node_type = ['Expanded', 'Terminal', 'Unexpanded']
-        #plt.legend(handles = node_type, loc = 'lower left')
         te_text = str('TE threshold: ' + str(te_thresh))
         text_box = AnchoredText(te_text, frameon=True, loc='lower left', pad=0.5)
         plt.setp(text_box.patch, facecolor='white', alpha=0.5)
@@ -281,12 +261,12 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
         text_box2 = AnchoredText(te_text2, frameon=True, loc='lower center', pad=0.5)
         plt.gca().add_artist(text_box2)
 
-        #https://stackoverflow.com/questions/11423369/matplotlib-legend-circle-markers
         line1 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="#1f75ae")
         line2 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="green")
         line3 = mlin.Line2D([], [], color="white", marker='o', markersize=15,  markerfacecolor="yellow")
         plt.legend((line1, line2, line3), ('Expanded', 'Terminal', 'Unexpanded'), numpoints=1, loc='lower right')
-        plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root_orig) + '-tree.jpg'))
+        #plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root_orig) + '-tree.jpg'))
+        plt.savefig(f"{tree_dir}{edge_type}-te-{te_thresh}-root-{root_orig}-tree.jpg")
         plt.clf()
 
 
@@ -327,6 +307,8 @@ def te_rollout(in_roots, in_edges_df, max_visits=6):
 
 def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
     # number of added nodes
+    #TODO have appended number in unexpanded node names represent 
+    # number of times it shows up, instead of random value
     n=0
     lengths = {}
     te_levels_df = {}
@@ -359,7 +341,8 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
                     new_node = 120 + n
                     n+=1
                     actor_name = actors[to_node]
-                    actors[new_node] = str(actor_name + '_' + str(n)) 
+                    #actors[new_node] = str(actor_name + '_' + str(n)) 
+                    actors[new_node] = f"{actor_name}_{n}"
                     nodepos = ((e['Source']==from_node) & (e['Target']==to_node))
                     e.loc[nodepos, ['Target']]=new_node
             visited_cap = set([k for k, v in visited.items() if v > max_visits])
@@ -386,12 +369,6 @@ def bfs_tree_AB(G, source, visited_lim, depth_lim, reverse=False, depth_limit=No
         depth_limit=depth_limit,
         sort_neighbors=sort_neighbors,
     )
-    #print(list(edges_gen)) THIS BREAKS THINGS
-    #TODO
-    # Only include edges from one layer to next
-    # Maybe just do something like...
-    # edges_gen = edges from te_rollout
-    #T.add_edges_from(edges_gen)
     T.add_edges_from(edges)
     return T
 
@@ -400,9 +377,6 @@ def generic_bfs_edges_AB(G, source, visited_lim, depth_lim, neighbors=None, dept
     if callable(sort_neighbors):
         _neighbors = neighbors
         neighbors = lambda node: iter(sort_neighbors(_neighbors(node)))
-
-    #visited = {source}
-    #visited_edges = {}
     visited = {}
     for i in range(1000):
         visited[i]=0
