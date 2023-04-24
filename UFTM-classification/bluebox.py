@@ -78,7 +78,7 @@ def select_TUFM(df, trust_cutoff=50, pop_cutoff=50):
 # dir for results output, an empty dir needs to already exist. If not empty, will overwrite.
 results_dir      = "results"
 data_dir         = "data"
-new_csv_filename = "news_table-v2-UT60-FM5.csv"
+new_csv_filename = "news_table-v3-UT60-FM5.csv"
 
 
 #   ### User input ###
@@ -86,7 +86,7 @@ new_csv_filename = "news_table-v2-UT60-FM5.csv"
 # news data
 news_filename   = "news_outlets.xlsx"
 pop_filename    = "majestic_million.csv"
-trust_filename  = "NewsGuard-metadata-2022090100.csv"
+trust_filename  = "metadata-2023041709.csv"
 trust_cutoff    = 60
 pop_cutoff      = 5
 
@@ -108,28 +108,35 @@ if __name__ == '__main__':
     # Join Majestic Million data to URL list
     # rename URL list column name to match majestic millions column name
     news_df.rename(columns = {'news outlets':'Domain'}, inplace=True)
-    
+    news_df = news_df[['Domain']] 
     #rename column in pop_df
     pop_df.rename(columns = {'RefSubNets':'pop_score'}, inplace=True)
+    # Keep only needed columns in pop_df
+    pop_df = pop_df[['Domain','pop_score']]
     # left join URL list and majestic million (popularity scores)
     final_df = pop_df
     #remove unnecessary columns from majestic million, just keep global rankings
     final_df = final_df[['Domain','pop_score']]
 
     print("Pre-Processing - merging NewsGuard to table")
-    #TODO waiting for NewsGuard data
-    # using dummy data
-    # rename Domain column
-    # remove dummy pop_score and tufm_class
-    trust_df = trust_df[['Domain','Score']]
+    # NewsGuard data
+    trust_df = trust_df[['Domain','Score','Country','Language']]
     trust_df.rename(columns = {'Score':'trust_score'}, inplace=True)
     # left join final_df and trust scores
     final_df = pd.merge(final_df, trust_df, on='Domain', how='left')
     final_df = pd.merge(news_df, final_df, on='Domain', how='left')
+    
 
+    # Add other languages (outside of 1000 news sources provided)
+    multilang_df = trust_df[trust_df['Language'] != ('en' or 'es')]
+
+    multilang_df = pd.merge(multilang_df, pop_df, on='Domain', how='left')
+    final_df = pd.concat([final_df,multilang_df]).drop_duplicates().reset_index(drop=True) 
+
+    print(final_df)
 
     print("Normalizing columns")
-    final_df = cutoff(final_df, 'pop_score')
+    #final_df = cutoff(final_df, 'pop_score')
     #final_df = reg_normalize(final_df, 'trust_score')
     final_df = reg_normalize(final_df, 'pop_score') 
     final_df['pop_score'] = final_df['pop_score'].round(decimals=1)
@@ -187,8 +194,8 @@ if __name__ == '__main__':
     print("Drop rows with incomplete data")
     final_df = final_df[final_df.tufm_class != str(0)]
 
-    print("Drop duplicate rows")
-    final_df = final_df.drop_duplicates()
+    #print("Drop duplicate rows")
+    #final_df = final_df.drop_duplicates()
     print("Generating new file in /results")
     results_path = os.path.join(results_dir + "/" + new_csv_filename)
     final_df.to_csv(results_path, index=False)
