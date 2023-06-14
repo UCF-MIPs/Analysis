@@ -1,7 +1,46 @@
-from bluebox import *
 import matplotlib.pyplot as plt
 plt.ion()
 import seaborn as sns
+from bluebox import select_TUFM, log_normalize, reg_normalize
+import os
+import pandas as pd
+import numpy as np
+
+# dir for results output, an empty dir needs to already exist. If not empty, will overwrite.
+results_dir      = "results"
+data_dir         = "data"
+new_csv_filename = "news_table-v3-UT60-FM5.csv"
+
+news_filename    = "news_outlets.xlsx"
+pop_filename     = "majestic_million.csv"
+trust_filename   = "metadata-2023041709.csv"
+trust_cutoff     = 60
+pop_cutoff       = 5
+
+news_data_path  = os.path.join(data_dir + "/" + news_filename)
+news_df         = pd.read_excel(news_data_path)
+pop_data_path   = os.path.join(data_dir + "/" + pop_filename)
+pop_df          = pd.read_csv(pop_data_path)
+trust_data_path = os.path.join(data_dir + "/" + trust_filename)
+trust_df        = pd.read_csv(trust_data_path)
+results_path    = os.path.join(results_dir + "/" + new_csv_filename)
+
+pop_df.rename(columns = {'RefSubNets':'pop_score'}, inplace=True)
+pop_df = pop_df[['Domain','pop_score']]
+final_df = pop_df
+final_df = final_df[['Domain','pop_score']]
+trust_df = trust_df[['Domain','Score','Country','Language']]
+trust_df.rename(columns = {'Score':'trust_score'}, inplace=True)
+final_df = pd.merge(final_df, trust_df, on='Domain', how='left')
+final_df['pop_score'].replace('', np.nan, inplace=True)
+final_df['trust_score'].replace('', np.nan, inplace=True)
+final_df.dropna(inplace=True)
+#final_df = log_normalize(final_df, 'pop_score')
+final_df = reg_normalize(final_df, 'pop_score')
+final_df['pop_score'] = final_df['pop_score'].round(decimals=1)
+#final_df = select_TUFM(final_df, trust_cutoff, pop_cutoff_en, pop_cutoff_glob)
+final_df = select_TUFM(final_df, trust_cutoff, pop_cutoff)
+
 
 
 TM = final_df[final_df['tufm_class'] == 'TM']
@@ -57,9 +96,4 @@ results_path = os.path.join(results_dir + "/" + "scatter.png")
 plt.savefig(results_path, bbox_inches="tight")
 
 
-sns.jointplot(x="trust_score",
-              y="pop_score",
-             edgecolor="white",
-             data=df);
-#plt.title("Scatter Plot with Marginal Histograms: Seaborn", size=18, pad=80)
-plt.savefig("marginal_plot_Seaborn.png")
+
