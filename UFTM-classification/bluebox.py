@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 import os
-
+import seaborn as sns
+import matplotlib.pyplot as plt
+from util import dist_bar_plot, dist_curve_plot, joint_plot 
 #   Script to generate trustworthiness/popularity table for news sources
 
 #   ### Functions ###
@@ -55,7 +57,47 @@ def reg_normalize2(df, column_name):
     return df
 
 
-def select_TUFM(df, trust_cutoff=50, pop_cutoff_en=50, pop_cutoff_glob=50):
+def log_normalize(df, column_name):
+    """
+    Normalize from 0 to 100 based on the log of input value from column_name
+    """
+    #TODO handle bad/empty values, either here or check input file
+    #normalize
+    data = df[column_name]
+    existing_range = data.max()-data.min()
+    x = data/existing_range
+    x = x*100
+    x  = np.log(x + 1)
+    #new_column_name = column_name + '_normalized'
+    df[column_name] = x
+    return df
+
+
+
+
+
+def select_TUFM(df, trust_cutoff=50, pop_cutoff=50):
+    """
+    A function to classify a news source based on reputation and popularity score.
+
+    Trustworthy (T) or Untrustworthy (U) 
+    and
+    Fringe (F) or Mainstream (M)
+    """
+
+    conditions = [ 
+            (df['trust_score'] >= trust_cutoff) & (df['pop_score'] >= pop_cutoff), #TM 
+            (df['trust_score'] >= trust_cutoff) & (df['pop_score'] < pop_cutoff), #TF 
+            (df['trust_score'] < trust_cutoff)  & (df['pop_score'] >= pop_cutoff), #UM 
+            (df['trust_score'] < trust_cutoff)  & (df['pop_score'] < pop_cutoff), #UF 
+    ]
+    categories = ['TM','TF', 'UM', 'UF']
+    df['tufm_class'] = np.select(conditions, categories)
+    return df
+
+
+
+def select_TUFM_seperatate_english(df, trust_cutoff=50, pop_cutoff_en=50, pop_cutoff_glob=50):
     """
     A function to classify a news source based on reputation and popularity score.
 
@@ -100,13 +142,16 @@ news_filename    = "news_outlets.xlsx"
 pop_filename     = "majestic_million.csv"
 trust_filename   = "metadata-2023041709.csv"
 trust_cutoff     = 60
-pop_cutoff_en    = 5
-pop_cutoff_glob  = 0.75
+#pop_cutoff_en    = 5
+#pop_cutoff_glob  = 0.75
+pop_cutoff       = 5
 
 #   ### Create dataframes ###
 
-news_data_path  = os.path.join(data_dir + "/" + news_filename)
-news_df         = pd.read_excel(news_data_path)
+# Not currently using provided news source list
+
+#news_data_path  = os.path.join(data_dir + "/" + news_filename)
+#news_df         = pd.read_excel(news_data_path)
 pop_data_path   = os.path.join(data_dir + "/" + pop_filename)
 pop_df          = pd.read_csv(pop_data_path)
 trust_data_path = os.path.join(data_dir + "/" + trust_filename)
@@ -120,13 +165,15 @@ if __name__ == '__main__':
     print("Pre-Processing - merging URL list and Majestic Million")
     # Join Majestic Million data to URL list
     # rename URL list column name to match majestic millions column name
-    news_df.rename(columns = {'news outlets':'Domain'}, inplace=True)
-    news_df = news_df[['Domain']] 
+    #news_df.rename(columns = {'news outlets':'Domain'}, inplace=True)
+    #news_df = news_df[['Domain']] 
+
     #rename column in pop_df
     pop_df.rename(columns = {'RefSubNets':'pop_score'}, inplace=True)
     # Keep only needed columns in pop_df
     pop_df = pop_df[['Domain','pop_score']]
     # left join URL list and majestic million (popularity scores)
+    # final_df = pd.merge(news_df, pop_df, on='Domain', how='left')
     final_df = pop_df
     #remove unnecessary columns from majestic million, just keep global rankings
     final_df = final_df[['Domain','pop_score']]
@@ -137,94 +184,80 @@ if __name__ == '__main__':
     trust_df.rename(columns = {'Score':'trust_score'}, inplace=True)
     # left join final_df and trust scores
     final_df = pd.merge(final_df, trust_df, on='Domain', how='left')
-    final_df = pd.merge(news_df, final_df, on='Domain', how='left')
+    #final_df = pd.merge(news_df, final_df, on='Domain', how='left')
     
 
     # Add other languages (outside of 1000 news sources provided)
-    multilang_df = trust_df[trust_df['Language'] != ('en' or 'es')]
+    #multilang_df = trust_df[trust_df['Language'] != ('en' or 'es')]
 
-    multilang_df = pd.merge(multilang_df, pop_df, on='Domain', how='left')
-    final_df = pd.concat([final_df,multilang_df]).drop_duplicates().reset_index(drop=True) 
+    #multilang_df = pd.merge(multilang_df, pop_df, on='Domain', how='left')
+    #final_df = pd.concat([final_df,multilang_df]).drop_duplicates().reset_index(drop=True) 
 
-    print(final_df)
+    print("Removing rows with empty values") 
+    final_df['pop_score'].replace('', np.nan, inplace=True)
+    final_df['trust_score'].replace('', np.nan, inplace=True)
+    final_df.dropna(inplace=True)
 
     print("Normalizing columns")
-    #final_df = cutoff(final_df, 'pop_score')
-    #final_df = reg_normalize(final_df, 'trust_score')
-    final_df = reg_normalize(final_df, 'pop_score') 
+    final_df = log_normalize(final_df, 'pop_score') 
     final_df['pop_score'] = final_df['pop_score'].round(decimals=1)
     
-
-    ### Plots ###
-    
-    '''
-    print("global popularity distribution plot")
-    import matplotlib.pyplot as plt
-    #final_df['pop_score'].sort_values(ignore_index=True).plot()
-    globpop = final_df[final_df['Language'] != 'en']
-    globpop = globpop.dropna()
-    print(globpop)
-    y_1 = np.linspace(0,max(globpop.pop_score), len(globpop.pop_score))
-    plt.plot(globpop['pop_score'].sort_values(ignore_index=True), y_1)
-    plt.ylabel("News Sources")
-    plt.xlabel("Popularity Score")
-    plt.title("News Source Popularity")
-    #plt.text(.5, .0001, "Source: Majestic Million", ha='center')
-    #plt.text(.5, .800, "Source: Majestic Million", ha='center')
-    plt.vlines(x=0.75, ymin=0, ymax=100, linestyles='dashed', label = "Popular-Fringe Threshold")
-    plt.legend()
-    plt.savefig('pop_score_dist.png')
-    '''
-    
-    
-    print("popularity distribution plot")
-    import matplotlib.pyplot as plt
-    plt.clf()
-    #final_df['trust_score'].sort_values(ignore_index=True).plot(kind="bar")
-    bins = np.arange(0,5,0.25)
-    globpop = final_df[final_df['Language'] != 'en']
-    globpop = globpop.dropna()
-    #final_df['pop_score'].hist(grid=False, bins=bins)
-    globpop['pop_score'].hist(grid=False, bins=bins)
-    plt.xticks(bins[::4])
-    plt.ylabel("Number of News Sources")
-    plt.xlabel("Popularity Score - global")
-    plt.title("News Source Popularity (Source: Majestic Million)")
-    #txt = "Source: Majestic Million"
-    #plt.figtext(0.5, 0.05, txt, wrap=True, horizontalalignment='center', fontsize=12)
-    plt.vlines(x=0.75, ymin=0, ymax=425, linestyles='dashed', colors='black', label = "Fringe-Popular Threshold")
-    plt.legend()
-    plt.savefig('pop_score_dist.png')
-    
-
-
-    '''
-    print("trustworthiness distribution plot")
-    plt.clf()
-    #final_df['trust_score'].sort_values(ignore_index=True).plot(kind="bar")
-    bins = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
-    final_df['trust_score'].hist(grid=False, bins=bins)
-    plt.xticks(bins)
-    plt.ylabel("Number of News Sources")
-    plt.xlabel("Trustworthiness Score")
-    plt.title("News Source Trustworthiness (Source: NewsGuard)")
-    #txt = "Source: NewsGuard"
-    #plt.figtext(0.5, 0.05, txt, wrap=True, horizontalalignment='center', fontsize=12)
-    plt.vlines(x=60, ymin=0, ymax=550, linestyles='dashed', colors='black', label = "Untrustworthy-Trustworthy Threshold")
-    plt.legend()
-    plt.savefig('trust_score_dist.png')
-    '''
-
     print("Classifying TUFM")
-    final_df = select_TUFM(final_df, trust_cutoff, pop_cutoff_en, pop_cutoff_glob)
-   
-    print("Drop rows with incomplete data")
-    final_df = final_df[final_df.tufm_class != str(0)]
+    #final_df = select_TUFM(final_df, trust_cutoff, pop_cutoff_en, pop_cutoff_glob)
+    final_df = select_TUFM(final_df, trust_cutoff, pop_cutoff)
 
+    print("Drop rows with incomplete data")
+    #final_df = final_df[final_df.tufm_class != str(0)]
     #print("Drop duplicate rows")
     #final_df = final_df.drop_duplicates()
+    #final_df.dropna() 
+
+    print("Seperate news sources into english and non-english (italian, german, french)")
+    df_en    = final_df[final_df['Language'] == 'en']
+    df_nonen = final_df[final_df['Language'] != ('en' or 'es')]
+    # spanish excluded due to of lack of data from NewsGuard
+    
+    ### Plots ###    
+    print("Distribution bar plots")
+    dist_bar_plot(df=df_en, metric = 'pop_score', cutoff_line=None, name='pop_en_dist_bar')
+    dist_bar_plot(df=df_en, metric = 'trust_score', cutoff_line=None, name='trust_en_dist_bar')
+    dist_bar_plot(df=df_nonen, metric = 'pop_score', cutoff_line=None, name='pop_nonen_dist_bar')
+    dist_bar_plot(df=df_nonen, metric = 'trust_score', cutoff_line=None, name='trust_nonen_dist_bar')
+
+
+    print("Distribution curve plots")
+    dist_curve_plot(df=df_en, metric = 'pop_score', cutoff_line=None, name='pop_en_dist_bar')
+    dist_curve_plot(df=df_en, metric = 'trust_score', cutoff_line=None, name='trust_en_dist_bar')
+    dist_curve_plot(df=df_nonen, metric = 'pop_score', cutoff_line=None, name='pop_nonen_dist_bar')
+    dist_curve_plot(df=df_nonen, metric = 'trust_score', cutoff_line=None, name='trust_nonen_dist_bar')
+
+    print('seaborn distribution plot, trust vs pop')
+    joint_plot(df_en, 'joint_plot_en')
+    joint_plot(df_nonen, 'joint_plot_nonen')
+
+
+    ### Splits ###
+    print("Getting non-US splits\n")
+    total = len(df_nonen)
+    print(f"total non-english sources: {total}")
+    fringe_perc = len(df_nonen[df_nonen['pop_score'] < pop_cutoff]) / total 
+    print(f"fringe non-english sources: {fringe_perc}%")
+    mainstream_perc = len(df_nonen[df_nonen['pop_score'] >= pop_cutoff]) / total
+    print(f"mainstream non-english sources: {mainstream_perc}%")
+
+    print("Getting english splits\n")
+    total = len(df_en)
+    print(f"total english sources: {total}")
+    fringe_perc = len(df_en[df_en['pop_score'] < pop_cutoff]) / total 
+    print(f"fringe english sources: {fringe_perc}%")
+    mainstream_perc = len(df_en[df_en['pop_score'] >= pop_cutoff]) / total
+    print(f"mainstream english sources: {mainstream_perc}%")
+    
     print("Generating new file in /results")
     results_path = os.path.join(results_dir + "/" + new_csv_filename)
+    results_path2 = os.path.join(results_dir + "/EN_" + new_csv_filename)
+    results_path3 = os.path.join(results_dir + "/NON_EN" + new_csv_filename)
     final_df.to_csv(results_path, index=False)
-
+    df_en.to_csv(results_path2, index=False)
+    df_nonen.to_csv(results_path3, index=False)
 

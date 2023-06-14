@@ -4,31 +4,11 @@ plt.ion()
 import seaborn as sns
 
 
-#print("Pre-Processing - merging URL list and Majestic Million")
-news_df.rename(columns = {'news outlets':'Domain'}, inplace=True)
-pop_df.rename(columns = {'RefSubNets':'pop_score'}, inplace=True)
-final_df = pd.merge(news_df, pop_df, on='Domain', how='left')
-final_df = final_df[['ID','Domain','pop_score']]
-
-#print("Pre-Processing - merging NewsGuard to table")
-trust_df = trust_df[['Domain','Score']]
-trust_df.rename(columns = {'Score':'trust_score'}, inplace=True)
-# left join final_df and trust scores
-final_df = pd.merge(final_df, trust_df, on='Domain', how='left')
-final_df = cutoff(final_df, 'pop_score')
-final_df = reg_normalize(final_df, 'pop_score')
-final_df['pop_score'] = final_df['pop_score'].round(decimals=1)
-#print("Classifying TUFM")
-final_df = select_TUFM(final_df, trust_cutoff, pop_cutoff)
-
-
-
-
 TM = final_df[final_df['tufm_class'] == 'TM']
 TF = final_df[final_df['tufm_class'] == 'TF']
 UM = final_df[final_df['tufm_class'] == 'UM']
 UF = final_df[final_df['tufm_class'] == 'UF']
-'''
+
 # MAIN PLOT
 plt.scatter(TM.trust_score, TM.pop_score, c='b', label = 'Trustworthy-Mainstream')
 plt.scatter(TF.trust_score, TF.pop_score, c='r', label = 'Trustworthy-Fringe')
@@ -75,18 +55,6 @@ plt.vlines(x=60, ymin=0, ymax=100, linestyles='dashed', colors='black',linewidth
 plt.hlines(y=5, xmin=0, xmax=100, linestyles='dashed', colors='black',linewidth=3.0)
 results_path = os.path.join(results_dir + "/" + "scatter.png")
 plt.savefig(results_path, bbox_inches="tight")
-
-'''
-
-df = final_df.drop(['tufm_class','ID','Domain'],axis=1)
-print(df)
-
-sns.scatterplot(x="trust_score", y="pop_score", data=df)
-plt.xlabel("X", size=16)
-plt.ylabel("y", size=16)
-plt.title("Scatter Plot with Seaborn", size=18)
-plt.savefig("simple_scatter_plot_Seanborn.png")
-
 
 
 sns.jointplot(x="trust_score",
