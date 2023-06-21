@@ -1,3 +1,8 @@
+To create an evironment including all necessary dependencies:
+'''bash
+conda env create -f env.yml
+'''
+
 To do    
 -auto-thresholding to find value needed to generate given number of nodes in tree     
 -integrate betweenness-centrality based node importance function to automatically select root nodes
