@@ -1,8 +1,6 @@
 To do    
 -auto-thresholding to find value needed to generate given number of nodes in tree     
--add cascade generation       
--maybe add multi-edge with colors corresponding to influence types       
--multiroot trees  
--clean bluebox  
--add axes distributions to UFTM classification scatter plot (or somehow better show distribution)  
+-integrate betweenness-centrality based node importance function to automatically select root nodes
+-simplify everything into basic functionality for use in the MIPs interface and place into core dir, only output trees and pathways, no plots
+
 
