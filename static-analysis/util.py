@@ -181,9 +181,10 @@ def plot_path_lengths(lengths, edge_type, te_thresh, paths_dir):
     plt.clf() 
 
 
-def strongest_path(tree,graph,root):
+def strongest_path_greedy(tree,graph,root):
     '''
     returns a list of edges to color
+    path selected by next strongest edge
     '''
     pathway = []
     # Get layers from tree
@@ -216,9 +217,58 @@ def strongest_path(tree,graph,root):
     return pathway
 
 
-def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim, orig_nodes):
+def strongest_path_summed(tree, graph, root):
+    '''
+    returns a list of edges to color
+    path selected by summed TE over all possible paths
+    '''
+
+    pathways = []
+    roots = []
+    leaves = []
+    for node in tree.nodes:
+        if tree.in_degree(node) == 0:
+            roots.append(node)
+        elif tree.out_degree(node) == 0 :
+            leaves.append(node)
+
+    for root in roots:
+        for leaf in leaves:
+            for path in nx.all_simple_edge_paths(tree, root, leaf) :
+                pathways.append(path)
+
+    total = 0
+    total_temp=0
+    for path in pathways:
+        for edge in path:
+            total_temp += float(list(graph.get_edge_data(*edge).values())[0])
+        if total_temp > total:
+            total = total_temp
+            strongest_pathway = path
+        total_temp=0 
+    return strongest_pathway
+
+
+def influential_node_ranking(g, pulltop=0, node_names=False):
+    '''
+    ranking nodes in a network based on betweenness-centrality
+    '''
+    BC_nodes = nx.betweenness_centrality(g, normalized = True)
+    sorted_nodes = sorted(BC_nodes.items(), key=lambda x:x[1], reverse=True)
+    if pulltop != 0:
+        sorted_nodes = sorted_nodes[:pulltop]
+    if node_names == True:
+        for n, i in enumerate(sorted_nodes):
+            sorted_nodes[n] = i[0]
+    return sorted_nodes
+
+
+def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation
+    input: 
+    ...
+    path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
     for root, graph in graphs.items():
         if not graph.has_node(root):
@@ -238,7 +288,13 @@ def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, dept
                     colormap_nodes.append('#1f78b4')
             elif(node not in orig_nodes):
                     colormap_nodes.append('yellow')
-        pathway = strongest_path(tree,graph,root)
+        if path == None:
+            pass
+        elif path == 'greedy':
+            pathway = strongest_path_greedy(tree,graph,root)
+        elif path == 'summed':
+            pathway = strongest_path_summed(tree,graph,root)
+        print(pathway)
         colormap_edges = []
         for edge in tree.edges:
             if(edge in pathway):

@@ -6,13 +6,13 @@ from util import plot_graphs, plot_betweenness_centrality, plot_degree, te_rollo
 import csv
 
 # Directories
-degree_dir      = 'results/te-network-degree/' 
-degree_diff_dir = 'results/te-network-degree-diff/'
-centrality_dir  = 'results/te-network-centrality/'
+#degree_dir      = 'results/te-network-degree/' 
+#degree_diff_dir = 'results/te-network-degree-diff/'
+#centrality_dir  = 'results/te-network-centrality/'
 paths_dir       = 'results/paths/'
 graphs_dir      = 'results/graphs/'
 tree_dir        = 'results/trees/trees-dynamic/'
-cascade_dir     = 'results/cascades/'
+#cascade_dir     = 'results/cascades/'
 
 # Thresholds for overview analytics (degree/centrality)
 te_thresh = 0.05 # used for influence across classifications, ex// TM_TM, UM_TM
@@ -64,19 +64,20 @@ if __name__ == "__main__":
         graphs.update({edge_type:g})
         
         # Differentiate between total TE threshold and individual TE thresholds
+        #TODO autothreshold
         if(edge_type == 'total_te'):
             thresh = te_total_thresh
         elif(edge_type != 'total_te'):
             thresh = te_thresh
 
         # Plotting functions
-        plot_degree(g, thresh, edge_type, degree_dir, degree_diff_dir)
-        plot_betweenness_centrality(g, thresh, edge_type, centrality_dir)
+        #plot_degree(g, thresh, edge_type, degree_dir, degree_diff_dir)
+        #plot_betweenness_centrality(g, thresh, edge_type, centrality_dir)
 
 
     ##### Pathways analysis #####
     for edge_type in edge_types:
-        for te_thresh in [0.05, 0.06, 0.07, 0.08, 0.09, 0.1]:
+        for te_thresh in [0.05]:
             cascade_df = graph_df.loc[(graph_df[edge_type] > te_thresh) & \
                                         (graph_df['Target'] > 1.) & (graph_df['Source']<101.) & (graph_df['Target']<101.)]
             
@@ -93,7 +94,7 @@ if __name__ == "__main__":
                 #print("Root: ", roots, " infl type: ", edge_type, " thresh: ", te_thresh, " num_nodes", g.number_of_nodes())
                 root_graphs.update({roots:g})
               
-            plot_htrees(root_graphs, tree_dir, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes)
+            plot_htrees(root_graphs, tree_dir, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path="summed")
 
             # Have to redo subgraph generation without added nodes for tree viz, te_rollout vs te_rollout_addnodes
             lengths, all_root_dfs = te_rollout(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim)
