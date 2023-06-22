@@ -263,6 +263,17 @@ def influential_node_ranking(g, pulltop=0, node_names=False):
     return sorted_nodes
 
 
+def auto_threshold(df, col, max_nodes):
+    '''
+    Finds weight threshold for a network that results in a given number of nodes
+    '''
+    for thresh in np.round(np.linspace(0., 1., 21, endpoint=True), 2):
+        df_filtered = df.loc[(df[col] > thresh)]
+        num_nodes = df['Source'].nunique() 
+        if(num_nodes < max_nodes):
+            break
+    return df_filtered
+
 def plot_htrees(graphs, tree_dir, edge_type,te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation

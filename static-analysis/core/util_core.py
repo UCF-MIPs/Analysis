@@ -77,9 +77,24 @@ def strongest_path_summed(tree, graph, root):
     return strongest_pathway
 
 
+def auto_threshold(df, col, max_nodes):
+    '''
+    Finds weight threshold for a network that results in a given number of nodes
+    '''
+    for thresh in np.round(np.linspace(0. ,1. ,21, endpoint=True), 2):
+        df_filtered = df.loc[(df[col] > thresh)]
+        num_nodes = df['Source'].nunique()
+        if(num_nodes < max_nodes):
+            break
+    return thresh, df_filtered
+
+
 def influential_node_ranking(g, pulltop=0, node_names=False):
     '''
     ranking nodes in a network based on betweenness-centrality
+    node_names: bool to indicate whether or not to return just node names:
+        True - just return top node names
+        False - return node names and betweenness centrality as tuple
     '''
     BC_nodes = nx.betweenness_centrality(g, normalized = True)
     sorted_nodes = sorted(BC_nodes.items(), key=lambda x:x[1], reverse=True)
@@ -91,7 +106,32 @@ def influential_node_ranking(g, pulltop=0, node_names=False):
     return sorted_nodes
 
 
-def htrees(graphs, tree_dir, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
+
+
+def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
+    '''
+    horizontal trees/hierarchical directed graph propogation
+    input: 
+    ...
+    path: strongest pathway selection method: None, greedy, or summed (total edge weight)
+    '''
+    for root, graph in graphs.items():
+        if not graph.has_node(root):
+            return
+        tree_edges = list(graph.edges)
+        tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
+        nx.relabel_nodes(tree,actors,copy=False)
+        nx.relabel_nodes(graph,actors,copy=False)
+        if path == None:
+            pass
+        elif path == 'greedy':
+            pathway = strongest_path_greedy(tree,graph,root)
+        elif path == 'summed':
+            pathway = strongest_path_summed(tree,graph,root)
+        return tree, pathway
+
+
+def plot_htrees(graphs, tree_dir, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation
     input: 

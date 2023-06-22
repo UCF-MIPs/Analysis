@@ -81,11 +81,10 @@ if __name__ == "__main__":
             cascade_df = graph_df.loc[(graph_df[edge_type] > te_thresh) & \
                                         (graph_df['Target'] > 1.) & (graph_df['Source']<101.) & (graph_df['Target']<101.)]
             
-            # root nodes are those identified previously as most influential.
-            # In the dynamic v4, these nodes are: 12=Ian56789, 23=NAJ562, 100=peter_pobjecky, 32=georgegalloway
-            root_nodes=[12, 32, 100, 23]
-            lengths, all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
-            plot_path_lengths(lengths = lengths, edge_type = edge_type, te_thresh = te_thresh, paths_dir = paths_dir)
+            # Identify influential nodes
+            #root_nodes=influential_node_ranking()
+                    
+            all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = cascade_df, max_visits=vis_lim, actors=actors)
             
             # Graph/tree plotting of paths from root
             root_graphs = {}
