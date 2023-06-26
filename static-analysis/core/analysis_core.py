@@ -8,7 +8,7 @@ import csv
 # input variables
 edge_type = 'UM_TM' # options: ...
 pathway_type="summed" # options: summed, greedy, or None
-num_roots = 3
+num_roots = 10
 root_selection = "edges" # options: "edges", "nodes"
 
 
@@ -29,7 +29,6 @@ orig_nodes = list(actors_orig.values())
 # initialize places to store results
 graphs = {}
 
-
 # Main
 if __name__ == "__main__":
     ##### Pathways analysis #####
@@ -43,11 +42,14 @@ if __name__ == "__main__":
 
     # Identify influential nodes
     if(root_selection == 'nodes'):
-        root_nodes = influential_node_ranking(g, pulltop=num_roots, node_names=True)
+        root_nodes = influential_node_ranking(g, pulltop=num_roots, node_names=False)
+        print(f'root nodes: {root_nodes}')
     elif(root_selection =='edges'):
-        #TODO Alina, please put your function in here, you'll likely need to pull the first nodes out of the edges you find, or something similar
+        root_edges, root_nodes, node_centralities = influential_edge_ranking(g, pulltop=num_roots, edge_names = False)
+        print(f'root edges and their centralities: {root_edges}') # list of top root edges
+        print(f'root nodes: {root_nodes}') # list of top nodes
+        print(f'nodes and their centralities: {node_centralities}') # dictionary of top nodes and corresponding centralities
     
-    print(f'root nodes: {root_nodes}')
         
     all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = graph_df1, max_visits=vis_lim, actors=actors)
             
