@@ -5,10 +5,12 @@ import matplotlib.pyplot as plt
 from util_core import te_rollout_addnodes, htrees, plot_htrees, auto_threshold, influential_node_ranking
 import csv
 
-tree_dir = 'results_trees/'
+edge_type = 'UM_TM' # options: ...
+pathway_type="summed" # options: summed, greedy, or None
+num_roots = 3
 
 # Limits
-vis_lim = 2
+vis_lim = 3
 dep_lim = 5
 
 # Dataframe of TE network
@@ -24,10 +26,6 @@ orig_nodes = list(actors_orig.values())
 # initialize places to store results
 graphs = {}
 
-
-edge_type = 'UM_TM' # options: ...
-pathway_type="summed" # options: summed, greedy, or None
-num_roots = 3
 
 # Main
 if __name__ == "__main__":
@@ -53,35 +51,14 @@ if __name__ == "__main__":
         g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
         root_graphs.update({roots:g})
               
-        
     # Generate tree information in for of lists (1 entry per root node)
     xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees(root_graphs, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path=pathway_type)
 
-
-    #print(xtrees)
-    #print(xpathways)
-    #print(xcolormap_nodes)
-    #print(xcolormap_edges)
-    #print(xpos)
-
-
     ts_figs = plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type)
 
-
-
-
+    # Save resulting tree plots
     print(ts_figs)
     for n, ax in enumerate(ts_figs):
         ax.figure.savefig(f'test_{n}.png')
 
-
-
-
-
-
-
-        #plot_htrees(root_graphs, tree_dir, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path="summed")
-        #htrees(root_graphs, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path="summed")
-
-         
 
