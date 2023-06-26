@@ -1,5 +1,5 @@
-To create an evironment including all necessary dependencies:
-'''bash
+To create an environment including all necessary dependencies:
+'''
 conda env create -f env.yml
 '''
 
