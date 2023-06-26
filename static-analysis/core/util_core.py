@@ -110,6 +110,19 @@ def influential_node_ranking(g, pulltop=0, node_names=False):
     return sorted_nodes
 
 
+def influential_edge_ranking(g, pulltop=0):
+    '''
+    ranking edges in a network based on edge betweenness-centrality
+    '''
+    BC_edges = nx.edge_betweenness_centrality(g, normalized=True)
+    sorted_edges = sorted(BC_edges.items(), key=lambda x:x[1], reverse=True)
+    
+    if pulltop != 0:
+        sorted_edges = sorted_edges[:pulltop]
+
+    return sorted_edges
+
+
 def generate_edge_types():
     #capture all edge types
     from_edges = ['UF', 'UM', 'TF', 'TM']

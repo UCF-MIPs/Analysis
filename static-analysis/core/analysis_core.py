@@ -2,12 +2,15 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from util_core import te_rollout_addnodes, htrees, plot_htrees, auto_threshold, influential_node_ranking
+from util_core import te_rollout_addnodes, htrees, plot_htrees, auto_threshold, influential_node_ranking, influential_edge_ranking
 import csv
 
+# input variables
 edge_type = 'UM_TM' # options: ...
 pathway_type="summed" # options: summed, greedy, or None
 num_roots = 3
+root_selection = "edges" # options: "edges", "nodes"
+
 
 # Limits
 vis_lim = 3
@@ -39,7 +42,11 @@ if __name__ == "__main__":
     g = nx.from_pandas_edgelist(graph_df1, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
 
     # Identify influential nodes
-    root_nodes=influential_node_ranking(g, pulltop=num_roots, node_names=True)
+    if(root_selection == 'nodes'):
+        root_nodes = influential_node_ranking(g, pulltop=num_roots, node_names=True)
+    elif(root_selection =='edges'):
+        #TODO Alina, please put your function in here, you'll likely need to pull the first nodes out of the edges you find, or something similar
+    
     print(f'root nodes: {root_nodes}')
         
     all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = graph_df1, max_visits=vis_lim, actors=actors)
