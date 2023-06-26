@@ -85,7 +85,8 @@ def auto_threshold(df, col, max_nodes):
     df = df[['Source', 'Target', col]]
     for thresh in np.round(np.linspace(0. ,1. ,41, endpoint=True), 3):
         df_filtered = df.loc[(df[col] > thresh)]
-        num_nodes = df_filtered['Source'].nunique()
+        #num_nodes = df_filtered['Source'].nunique()
+        num_nodes = len(set(zip(df_filtered['Source'],df_filtered['Target'])))
         print(num_nodes)
         if(num_nodes < max_nodes):
             break
@@ -109,7 +110,19 @@ def influential_node_ranking(g, pulltop=0, node_names=False):
     return sorted_nodes
 
 
+def generate_edge_types():
+    #capture all edge types
+    from_edges = ['UF', 'UM', 'TF', 'TM']
+    to_edges   = ['UF', 'UM', 'TF', 'TM']
 
+    #edge_types = ['UF_TM','UF_TM'] # repeat a few due to blank output #TODO fix
+    edge_types = []
+
+    for i in from_edges:
+        for j in to_edges:
+            edge_types.append(f"{i}_{j}")
+
+    return edge_types
 
 def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
     '''
@@ -118,6 +131,12 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
+    xtrees = []
+    xpathways = []
+    xcolormap_n = []
+    xcolormap_e = []
+    xpos = []
+
     for root, graph in graphs.items():
         if not graph.has_node(root):
             return
@@ -125,22 +144,80 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
         nx.relabel_nodes(tree,actors,copy=False)
         nx.relabel_nodes(graph,actors,copy=False)
+        root_orig = root
+        root = actors[root]
+        colormap_nodes = []
+        for node in tree:
+            if(node in orig_nodes):
+                if graph.out_degree(node)==0:    
+                    colormap_nodes.append('green')
+                else: 
+                    colormap_nodes.append('#1f78b4')
+            elif(node not in orig_nodes):
+                    colormap_nodes.append('yellow')
         if path == None:
             pass
         elif path == 'greedy':
             pathway = strongest_path_greedy(tree,graph,root)
         elif path == 'summed':
             pathway = strongest_path_summed(tree,graph,root)
-        return tree, pathway
+        colormap_edges = []
+        for edge in tree.edges:
+            if(edge in pathway):
+                colormap_edges.append('red')
+            else:
+                colormap_edges.append('black')
+        pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR") 
+ 
+        xtrees.append(tree)
+        xpathways.append(pathway)
+        xcolormap_n.append(colormap_nodes)
+        xcolormap_e.append(colormap_edges)
+        xpos.append(pos)
+
+    return xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
 
 
-def plot_htrees(graphs, tree_dir, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
+def plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type):
     '''
     horizontal trees/hierarchical directed graph propogation
     input: 
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
+    figs = []
+    for tree, pathway, colormap_nodes, colormap_edges, pos in zip (xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos):  
+        fig, ax = plt.subplots(figsize=(18,50))
+        nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=24, node_size=450, ax = ax)
+        #short
+        #fig = plt.figure(3,figsize=(20,20))
+        #tall
+        node_type = ['Expanded', 'Terminal', 'Unexpanded']
+        te_text = str('TE threshold: ' + str(te_thresh))
+        text_box = AnchoredText(te_text, frameon=True, loc='lower left', pad=0.5)
+        #ax.setp(text_box.patch, facecolor='white', alpha=0.5)
+        #ax.gca().add_artist(text_box)
+        te_text2 = str('Influence type: ' + '\n' + str(edge_type))
+        #text_box2 = AnchoredText(te_text2, frameon=True, loc='lower center', pad=0.5)
+        #ax.gca().add_artist(text_box2)
+        line1 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="#1f75ae")
+        line2 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="green")
+        line3 = mlin.Line2D([], [], color="white", marker='o', markersize=15,  markerfacecolor="yellow")
+        ax.legend((line1, line2, line3), ('Expanded', 'Terminal', 'Unexpanded'), numpoints=1, loc='lower right')
+        figs.append(ax)
+    return figs
+
+
+
+def plot_htrees_original(graphs, tree_dir, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
+    '''
+    horizontal trees/hierarchical directed graph propogation
+    input: 
+    ...
+    path: strongest pathway selection method: None, greedy, or summed (total edge weight)
+    '''
+    plt.clf()
+
     for root, graph in graphs.items():
         if not graph.has_node(root):
             return
@@ -172,11 +249,33 @@ def plot_htrees(graphs, tree_dir, edge_type, te_thresh, actors, visited_lim, dep
                 colormap_edges.append('red')
             else:
                 colormap_edges.append('black')
-        pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
+        pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR") 
         nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, \
                 with_labels=True, width=3, font_size=24, node_size=450)
-        
-        # output: tree, path
+        #short
+        #plt.figure(3,figsize=(20,20))
+        #tall
+        plt.figure(3,figsize=(18,50))
+        node_type = ['Expanded', 'Terminal', 'Unexpanded']
+        te_text = str('TE threshold: ' + str(te_thresh))
+        text_box = AnchoredText(te_text, frameon=True, loc='lower left', pad=0.5)
+        plt.setp(text_box.patch, facecolor='white', alpha=0.5)
+        plt.gca().add_artist(text_box)
+        te_text2 = str('Influence type: ' + '\n' + str(edge_type))
+        text_box2 = AnchoredText(te_text2, frameon=True, loc='lower center', pad=0.5)
+        plt.gca().add_artist(text_box2)
+
+        line1 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="#1f75ae")
+        line2 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="green")
+        line3 = mlin.Line2D([], [], color="white", marker='o', markersize=15,  markerfacecolor="yellow")
+        plt.legend((line1, line2, line3), ('Expanded', 'Terminal', 'Unexpanded'), numpoints=1, loc='lower right')
+
+        #plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root_orig) + '-tree.jpg'))
+	#plt.savefig(f"{tree_dir}{edge_type}-te-{te_thresh}-root-{root_orig}-tree.jpg")
+        #plt.clf()
+
+
+
 
 
 
@@ -201,6 +300,7 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
             last_visited = visited.copy()
             for node in this_level_nodes:
                 visited[node] += 1
+                print(node)
             if(last_visited == visited):
                 break
             this_level += 1
