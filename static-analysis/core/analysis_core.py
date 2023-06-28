@@ -6,10 +6,10 @@ from util_core import te_rollout_addnodes, htrees, plot_htrees, auto_threshold, 
 import csv
 
 # input variables
-edge_type = 'UM_TM' # options: ...
+edge_type = 'UM_TF' # options: ...
 pathway_type="summed" # options: summed, greedy, or None
 num_roots = 10
-root_selection = "nodes" # options: "edges", "nodes"
+root_selection = "edges" # options: "edges", "nodes"
 
 
 # Limits
@@ -69,5 +69,3 @@ if __name__ == "__main__":
     print(ts_figs)
     for n, ax in enumerate(ts_figs):
         ax.figure.savefig(f'test_{n}.png')
-
-

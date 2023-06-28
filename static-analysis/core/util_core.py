@@ -171,7 +171,7 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
 
     for root, graph in graphs.items():
         if not graph.has_node(root):
-            return
+            continue
         tree_edges = list(graph.edges)
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
         nx.relabel_nodes(tree,actors,copy=False)
@@ -252,7 +252,7 @@ def plot_htrees_original(graphs, tree_dir, edge_type, te_thresh, actors, visited
 
     for root, graph in graphs.items():
         if not graph.has_node(root):
-            return
+            continue
         tree_edges = list(graph.edges)
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
         nx.relabel_nodes(tree,actors,copy=False)
