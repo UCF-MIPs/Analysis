@@ -2,11 +2,18 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from util_core import te_rollout_addnodes, htrees, plot_htrees, auto_threshold, influential_node_ranking, influential_edge_ranking
+#import te_rollout_addnodes, htrees, plot_htrees, auto_threshold, influential_node_ranking, influential_edge_ranking, strongest_path_greedy, strongest_path_summed
+#from src import *
+from src import auto_threshold
+from src import te_rollout_addnodes
+from src import htrees
+from src import plot_htrees
+from src import influential_node_ranking
+from src import influential_edge_ranking
 import csv
 
 # input variables
-edge_type = 'UM_TF' # options: ...
+edge_type = 'TM_TM' # options: ...
 pathway_type="summed" # options: summed, greedy, or None
 num_roots = 10
 root_selection = "edges" # options: "edges", "nodes"
@@ -34,7 +41,7 @@ if __name__ == "__main__":
     ##### Pathways analysis #####
        
     #Autothreshold
-    te_thresh, graph_df1 = auto_threshold(cascade_df, edge_type, 80)
+    te_thresh, graph_df1 = auto_threshold.auto_threshold(cascade_df, edge_type, 80)
     print(f'te_thresh: {te_thresh}')
     print(graph_df1)
         
@@ -42,16 +49,16 @@ if __name__ == "__main__":
 
     # Identify influential nodes
     if(root_selection == 'nodes'):
-        root_nodes = influential_node_ranking(g, pulltop=num_roots, node_names=True)
+        root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=num_roots, node_names=True)
         print(f'root nodes: {root_nodes}')
     elif(root_selection =='edges'):
-        root_edges, root_nodes, node_centralities = influential_edge_ranking(g, pulltop=num_roots, edge_names = True)
+        root_edges, root_nodes, node_centralities = influential_edge_ranking.influential_edge_ranking(g, pulltop=num_roots, edge_names = True)
         print(f'root edges and their centralities: {root_edges}') # list of top root edges
         print(f'root nodes: {root_nodes}') # list of top nodes
         print(f'nodes and their centralities: {node_centralities}') # dictionary of top nodes and corresponding centralities
     
         
-    all_root_dfs, actors = te_rollout_addnodes(in_roots = root_nodes, in_edges_df = graph_df1, max_visits=vis_lim, actors=actors)
+    all_root_dfs, actors = te_rollout_addnodes.te_rollout_addnodes(in_roots = root_nodes, in_edges_df = graph_df1, max_visits=vis_lim, actors=actors)
             
 
     # Graph/tree plotting of paths from root
@@ -61,11 +68,22 @@ if __name__ == "__main__":
         root_graphs.update({roots:g})
               
     # Generate tree information in for of lists (1 entry per root node)
-    xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees(root_graphs, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path=pathway_type)
+    xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees.htrees(root_graphs, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path=pathway_type)
 
-    ts_figs = plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type)
+    ts_figs = plot_htrees.plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type)
+
+
+    #TODO fix names in case of spaces
+    #actors2 = pd.DataFrame(actors)
+    #actors2.columns = actors2.columns.str.replace(' ', '')
 
     # Save resulting tree plots
     print(ts_figs)
-    for n, ax in enumerate(ts_figs):
-        ax.figure.savefig(f'test_{n}.png')
+    for ax, root in zip(ts_figs, root_nodes):
+        rootname = actors[root]
+        print(f"rootname: {rootname}")
+        # check to see if root node is mapped somewhere
+        ax.figure.savefig(f'{edge_type}_te_thresh{te_thresh}_root{rootname}.png')
+        
+
+

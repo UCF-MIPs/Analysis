@@ -1,5 +1,5 @@
 import networkx as nx
-import strongest_path_greedy, strongest_path_summed
+from . import strongest_path_greedy, strongest_path_summed
 from networkx.drawing.nx_agraph import graphviz_layout
 from collections import deque
 
@@ -38,9 +38,9 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
         if path == None:
             pass
         elif path == 'greedy':
-            pathway = strongest_path_greedy(tree,graph,root)
+            pathway = strongest_path_greedy.strongest_path_greedy(tree,graph,root)
         elif path == 'summed':
-            pathway = strongest_path_summed(tree,graph,root)
+            pathway = strongest_path_summed.strongest_path_summed(tree,graph,root)
         colormap_edges = []
         for edge in tree.edges:
             if(edge in pathway):
