@@ -23,7 +23,6 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
             last_visited = visited.copy()
             for node in this_level_nodes:
                 visited[node] += 1
-                print(node)
             if(last_visited == visited):
                 break
             this_level += 1

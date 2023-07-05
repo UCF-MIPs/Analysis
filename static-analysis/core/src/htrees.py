@@ -11,6 +11,7 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
+    rnodes = []
     xtrees = []
     xpathways = []
     xcolormap_n = []
@@ -48,14 +49,14 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
             else:
                 colormap_edges.append('black')
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-
+        rnodes.append(root)
         xtrees.append(tree)
         xpathways.append(pathway)
         xcolormap_n.append(colormap_nodes)
         xcolormap_e.append(colormap_edges)
         xpos.append(pos)
 
-    return xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
+    return rnodes, xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
 
 
 
