@@ -1,3 +1,4 @@
+import networkx as nx
 
 def strongest_path_summed(tree, graph, root):
     '''

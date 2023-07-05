@@ -1,5 +1,5 @@
 import networkx as nx
-import strongest_path_greedy, strongest_path_summed
+from . import strongest_path_greedy, strongest_path_summed
 from networkx.drawing.nx_agraph import graphviz_layout
 from collections import deque
 
@@ -11,6 +11,7 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
+    rnodes = []
     xtrees = []
     xpathways = []
     xcolormap_n = []
@@ -38,9 +39,9 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
         if path == None:
             pass
         elif path == 'greedy':
-            pathway = strongest_path_greedy(tree,graph,root)
+            pathway = strongest_path_greedy.strongest_path_greedy(tree,graph,root)
         elif path == 'summed':
-            pathway = strongest_path_summed(tree,graph,root)
+            pathway = strongest_path_summed.strongest_path_summed(tree,graph,root)
         colormap_edges = []
         for edge in tree.edges:
             if(edge in pathway):
@@ -48,14 +49,14 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
             else:
                 colormap_edges.append('black')
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-
+        rnodes.append(root)
         xtrees.append(tree)
         xpathways.append(pathway)
         xcolormap_n.append(colormap_nodes)
         xcolormap_e.append(colormap_edges)
         xpos.append(pos)
 
-    return xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
+    return rnodes, xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
 
 
 

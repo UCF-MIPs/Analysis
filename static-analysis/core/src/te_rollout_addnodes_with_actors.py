@@ -2,7 +2,7 @@ import pandas as pd
 import networkx as nx 
 
 
-def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
+def te_rollout_addnodes_with_actors(in_roots, in_edges_df, max_visits):
     # number of added nodes
     #TODO have appended number in unexpanded node names represent
     # number of times it shows up, instead of random value
@@ -12,7 +12,9 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
     for in_root in in_roots:
         visited = {}
         root_df = pd.DataFrame()
-        for node in range(10000):
+        #for node in set(zip(in_edges_df['Source'],in_edges_df['Target'])):
+        for node in pd.unique(in_edges_df[['Source', 'Target']].values.ravel('K')):
+            print(node)
             visited.update({node:0})
         this_level_nodes = in_root
         te_values = []
@@ -23,7 +25,6 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
             last_visited = visited.copy()
             for node in this_level_nodes:
                 visited[node] += 1
-                print(node)
             if(last_visited == visited):
                 break
             this_level += 1
@@ -34,10 +35,9 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
                 to_node = edge['Target']
                 if visited[to_node]>0:
                     #add new edge to new node with same outgoing actor ID
-                    new_node = 120 + n
+                    new_node = f"{to_node}_{n}"
+                    visited.update({new_node:0})
                     n+=1
-                    actor_name = actors[to_node]
-                    actors[new_node] = f"{actor_name}_{n}"
                     nodepos = ((e['Source']==from_node) & (e['Target']==to_node))
                     e.loc[nodepos, ['Target']]=new_node
             visited_cap = set([k for k, v in visited.items() if v > max_visits])
@@ -46,5 +46,5 @@ def te_rollout_addnodes(in_roots, in_edges_df, max_visits, actors):
             this_level_nodes = set(e['Target'].to_list()).difference(visited_cap)
         all_root_dfs.update({in_root:root_df})
 
-    return all_root_dfs, actors
+    return all_root_dfs
 
