@@ -32,6 +32,8 @@ def generate_trees_with_actors(g, edge_type, te_thresh):
         g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
         root_graphs.update({roots:g})
 
+    orig_nodes = g.nodes
+
     # Generate tree information in for of lists (1 entry per root node)
     rnodes, xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees_with_actors.htrees_with_actors(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_type) 
 
@@ -56,8 +58,6 @@ cascade_df = cascade_df.loc[(cascade_df['Source'] > 1.) & (cascade_df['Target'] 
 # Dict of actor names (v2/v4/dynamic)
 actor_df = pd.read_csv('actors.csv')
 actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
-actors_orig = actors
-orig_nodes = list(actors_orig.values())
 
 te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 80)
 
