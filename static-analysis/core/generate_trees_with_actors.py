@@ -13,6 +13,10 @@ from src import generate_edge_types
 
 def generate_trees_with_actors(g, edge_type, te_thresh):
 
+
+    orig_nodes = g.nodes
+    print(orig_nodes)
+
     pathway_type="greedy" # options: summed, greedy, or None
     vis_lim = 3
     dep_lim = 5
@@ -31,8 +35,6 @@ def generate_trees_with_actors(g, edge_type, te_thresh):
     for roots, root_df in all_root_dfs.items():
         g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
         root_graphs.update({roots:g})
-
-    orig_nodes = g.nodes
 
     # Generate tree information in for of lists (1 entry per root node)
     rnodes, xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees_with_actors.htrees_with_actors(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_type) 
