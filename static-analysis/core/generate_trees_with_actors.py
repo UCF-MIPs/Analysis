@@ -2,14 +2,16 @@ import networkx as nx
 import pandas as pd
 from src import auto_threshold
 from src import te_rollout_addnodes
+from src import te_rollout_addnodes_with_actors
 from src import htrees
+from src import htrees_with_actors
 from src import plot_htrees
 from src import influential_node_ranking
 from src import influential_edge_ranking
 from src import generate_edge_types
 
 
-def generate_trees(g, actors, edge_type, te_thresh):
+def generate_trees_with_actors(g, edge_type, te_thresh):
 
 
     pathway_type="greedy" # options: summed, greedy, or None
@@ -23,7 +25,7 @@ def generate_trees(g, actors, edge_type, te_thresh):
 
     g_df = nx.to_pandas_edgelist(g, source='Source', target='Target')
 
-    all_root_dfs, actors = te_rollout_addnodes.te_rollout_addnodes(in_roots = root_nodes, in_edges_df = g_df, max_visits=vis_lim, actors=actors)
+    all_root_dfs = te_rollout_addnodes_with_actors.te_rollout_addnodes_with_actors(in_roots = root_nodes, in_edges_df = g_df, max_visits=vis_lim)
 
     # Graph/tree plotting of paths from root
     root_graphs = {}
@@ -32,7 +34,7 @@ def generate_trees(g, actors, edge_type, te_thresh):
         root_graphs.update({roots:g})
 
     # Generate tree information in for of lists (1 entry per root node)
-    rnodes, xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees.htrees(root_graphs, edge_type, te_thresh, actors, vis_lim, dep_lim, orig_nodes, path=pathway_type)
+    rnodes, xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees_with_actors.htrees_with_actors(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_type) 
 
     ts_figs = plot_htrees.plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type)
 
@@ -62,9 +64,8 @@ te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 80)
 
 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
 
-print(actors)
+nx.relabel_nodes(g, actors, copy=False)
 
-generate_trees(g, actors, edge_type, te_thresh)
-
+generate_trees_with_actors(g, edge_type, te_thresh)
 
 
