@@ -13,7 +13,6 @@ from src import generate_edge_types
 
 def generate_trees_with_actors(g, edge_type, te_thresh):
 
-
     pathway_type="greedy" # options: summed, greedy, or None
     vis_lim = 3
     dep_lim = 5
