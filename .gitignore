@@ -7,9 +7,13 @@ static-analysis-TE-check/raw_data/*
 static-analysis-TE-check/results/*
 static-analysis-TE-check/__pycache__
 static-analysis/core/actor_te_edges_2018_03_01_2018_05_01.csv
+static-analysis/core_v2/actor_te_edges_2018_03_01_2018_05_01.csv
 static-analysis/core/actors.csv
+static-analysis/core_v2/actors_v4.csv
 static-analysis/core/__pycache__
+static-analysis/core_v2/__pycache__
 static-analysis/core/src/__pycache__
+static-analysis/core_v2/src/__pycache__
 UFTM-classification/results/*
 UFTM-classification/data/*
 UFTM-classification/resources/*

@@ -4,7 +4,7 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from collections import deque
 
 
-def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
+def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation
     input:
@@ -23,10 +23,7 @@ def htrees(graphs, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_no
             continue
         tree_edges = list(graph.edges)
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
-        nx.relabel_nodes(tree,actors,copy=False)
-        nx.relabel_nodes(graph,actors,copy=False)
         root_orig = root
-        root = actors[root]
         colormap_nodes = []
         for node in tree:
             if(node in orig_nodes):

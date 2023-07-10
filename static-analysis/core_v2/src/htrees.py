@@ -1,28 +1,29 @@
-import maplotlib.pyplot as plt
 import networkx as nx
+from . import strongest_path_greedy, strongest_path_summed
 from networkx.drawing.nx_agraph import graphviz_layout
 from collections import deque
-import matplotlib.lines as mlin
-from matplotlib.offsetbox import AnchoredText
 
-def plot_htrees_original(graphs, tree_dir, edge_type, te_thresh, actors, visited_lim, depth_lim, orig_nodes, path=None):
+
+def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation
     input:
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
-    plt.clf()
+    rnodes = []
+    xtrees = []
+    xpathways = []
+    xcolormap_n = []
+    xcolormap_e = []
+    xpos = []
 
     for root, graph in graphs.items():
         if not graph.has_node(root):
             continue
         tree_edges = list(graph.edges)
         tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
-        nx.relabel_nodes(tree,actors,copy=False)
-        nx.relabel_nodes(graph,actors,copy=False)
         root_orig = root
-        root = actors[root]
         colormap_nodes = []
         for node in tree:
             if(node in orig_nodes):
@@ -35,10 +36,9 @@ def plot_htrees_original(graphs, tree_dir, edge_type, te_thresh, actors, visited
         if path == None:
             pass
         elif path == 'greedy':
-            pathway = strongest_path_greedy(tree,graph,root)
+            pathway = strongest_path_greedy.strongest_path_greedy(tree,graph,root)
         elif path == 'summed':
-            pathway = strongest_path_summed(tree,graph,root)
-        print(pathway)
+            pathway = strongest_path_summed.strongest_path_summed(tree,graph,root)
         colormap_edges = []
         for edge in tree.edges:
             if(edge in pathway):
@@ -46,29 +46,16 @@ def plot_htrees_original(graphs, tree_dir, edge_type, te_thresh, actors, visited
             else:
                 colormap_edges.append('black')
         pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
-        nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, \
-                with_labels=True, width=3, font_size=24, node_size=450)
-        #short
-        #plt.figure(3,figsize=(20,20))
-        #tall
-        plt.figure(3,figsize=(18,50))
-        node_type = ['Expanded', 'Terminal', 'Unexpanded']
-        te_text = str('TE threshold: ' + str(te_thresh))
-        text_box = AnchoredText(te_text, frameon=True, loc='lower left', pad=0.5)
-        plt.setp(text_box.patch, facecolor='white', alpha=0.5)
-        plt.gca().add_artist(text_box)
-        te_text2 = str('Influence type: ' + '\n' + str(edge_type))
-        text_box2 = AnchoredText(te_text2, frameon=True, loc='lower center', pad=0.5)
-        plt.gca().add_artist(text_box2)
+        rnodes.append(root)
+        xtrees.append(tree)
+        xpathways.append(pathway)
+        xcolormap_n.append(colormap_nodes)
+        xcolormap_e.append(colormap_edges)
+        xpos.append(pos)
 
-        line1 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="#1f75ae")
-        line2 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="green")
-        line3 = mlin.Line2D([], [], color="white", marker='o', markersize=15,  markerfacecolor="yellow")
-        plt.legend((line1, line2, line3), ('Expanded', 'Terminal', 'Unexpanded'), numpoints=1, loc='lower right')
+    return rnodes, xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
 
-        #plt.savefig(str(tree_dir + edge_type + "-te-" + str(te_thresh) + "-root-"+ str(root_orig) + '-tree.jpg'))
-        #plt.savefig(f"{tree_dir}{edge_type}-te-{te_thresh}-root-{root_orig}-tree.jpg")
-        #plt.clf()
+
 
 
 # OVERRIDES
@@ -121,6 +108,8 @@ def bfs_edges_AB(G, source, visited_lim, depth_lim, reverse=False, depth_limit=N
     else:
         successors = G.neighbors
     yield from generic_bfs_edges_AB(G, source, visited_lim, depth_lim, successors, depth_limit, sort_neighbors)
+
+
 
 
 
