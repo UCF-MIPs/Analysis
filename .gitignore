@@ -1,14 +1,8 @@
 static-analysis/data/*
 static-analysis/results/*
 static-analysis/old_results/*
+static-analysis/src/__pycache__
 static-analysis/__pycache__
-static-analysis-TE-check/data/*
-static-analysis-TE-check/raw_data/*
-static-analysis-TE-check/results/*
-static-analysis-TE-check/__pycache__
-static-analysis/core/actor_te_edges_2018_03_01_2018_05_01.csv
-static-analysis/core/actors.csv
-static-analysis/core/__pycache__
 UFTM-classification/results/*
 UFTM-classification/data/*
 UFTM-classification/resources/*
