@@ -24,8 +24,12 @@ infl_df = pd.DataFrame()
 edge_types = generate_edge_types.generate_edge_types() 
 av_pathway_lengths = {}
 longest_pathway_lengths = {}
-for edge_type in edge_types:
+av_pathway_weights = {}
+strongest_pathway_weights = {}
 
+
+'''
+for edge_type in edge_types:
     te_thresh = 0.1
     graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
     g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
@@ -64,7 +68,7 @@ plt.xticks(range(len(longest_pathway_lengths)), names, rotation='vertical')
 plt.ylabel('path length')
 plt.title('Longest pathway length')
 plt.savefig('longest_path_lengths.png')
-
+'''
 
 
 
@@ -73,6 +77,45 @@ plt.savefig('longest_path_lengths.png')
 pathway_selection = "summed"
 
 
+for edge_type in edge_types:
+    te_thresh = 0.1
+    graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
+    g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
+    nx.relabel_nodes(g, actors, copy=False)
+    xtrees, xpathways, xstrengths = generate_tree_data(g, edge_type, te_thresh, pathway_selection)
+    pathway_weights = []
+    #for tree in xtrees:
+    #    print(tree)
+    strongest_weight = 0
+    for pathway, strength in zip(xpathways, xstrengths):
+        pathway_weights.append(strength)
+        if strength > strongest_weight:
+            strongest_weight = strength
+    path_av = sum(pathway_weights)/len(pathway_weights)
+    av_pathway_weights[edge_type] = path_av
+    strongest_pathway_weights[edge_type] = strongest_weight
+
+
+names = list(av_pathway_weights.keys())
+values = list(av_pathway_weights.values())
+
+plt.ion()
+plt.bar(range(len(av_pathway_weights)), values)
+plt.xticks(range(len(av_pathway_weights)), names, rotation='vertical')
+plt.ylabel('path weight')
+plt.title('Average pathway length')
+plt.savefig('ave_path_weights.png')
+plt.clf()
+
+
+names = list(longest_pathway_lengths.keys())
+values = list(longest_pathway_lengths.values())
+
+plt.bar(range(len(longest_pathway_lengths)), values)
+plt.xticks(range(len(longest_pathway_lengths)), names, rotation='vertical')
+plt.ylabel('path weight')
+plt.title('Strongest pathway weight')
+plt.savefig('strongest_path_weights.png')
 
 
 # TODO include the following traditional network metrics to run stat correlation against pathway metrics

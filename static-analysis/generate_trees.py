@@ -50,9 +50,9 @@ def generate_tree_data(g, edge_type, te_thresh, pathway_type):
         root_graphs.update({in_root:g})
 
     # Generate tree information in for of lists (1 entry per root node)
-    rnodes, xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos = htrees.htrees(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_type) 
+    rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = htrees.htrees(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_type) 
 
-    return xtrees, xpathways
+    return xtrees, xpathways, xstrengths
 
 
 
