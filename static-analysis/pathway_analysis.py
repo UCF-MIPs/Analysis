@@ -90,6 +90,7 @@ for edge_type in edge_types:
     for pathway, strength in zip(xpathways, xstrengths):
         pathway_weights.append(strength)
         if strength > strongest_weight:
+            print(strength)
             strongest_weight = strength
     path_av = sum(pathway_weights)/len(pathway_weights)
     av_pathway_weights[edge_type] = path_av
@@ -103,18 +104,18 @@ plt.ion()
 plt.bar(range(len(av_pathway_weights)), values)
 plt.xticks(range(len(av_pathway_weights)), names, rotation='vertical')
 plt.ylabel('path weight')
-plt.title('Average pathway length')
+plt.title('Average pathway weightss')
 plt.savefig('ave_path_weights.png')
 plt.clf()
 
 
-names = list(longest_pathway_lengths.keys())
-values = list(longest_pathway_lengths.values())
+names = list(strongest_pathway_weights.keys())
+values = list(strongest_pathway_weights.values())
 
-plt.bar(range(len(longest_pathway_lengths)), values)
-plt.xticks(range(len(longest_pathway_lengths)), names, rotation='vertical')
+plt.bar(range(len(strongest_pathway_weights)), values)
+plt.xticks(range(len(strongest_pathway_weights)), names, rotation='vertical')
 plt.ylabel('path weight')
-plt.title('Strongest pathway weight')
+plt.title('Strongest pathway weights')
 plt.savefig('strongest_path_weights.png')
 
 
