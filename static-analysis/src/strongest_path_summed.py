@@ -29,6 +29,6 @@ def strongest_path_summed(tree, graph, root):
             total = total_temp
             strongest_pathway = path
         total_temp=0
-    return strongest_pathway
+    return strongest_pathway, total
 
 

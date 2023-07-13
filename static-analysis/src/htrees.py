@@ -17,6 +17,7 @@ def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, pat
     xcolormap_n = []
     xcolormap_e = []
     xpos = []
+    xstrengths = []
 
     for root, graph in graphs.items():
         if not graph.has_node(root):
@@ -36,9 +37,9 @@ def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, pat
         if path == None:
             pass
         elif path == 'greedy':
-            pathway = strongest_path_greedy.strongest_path_greedy(tree,graph,root)
+            pathway, strength = strongest_path_greedy.strongest_path_greedy(tree,graph,root)
         elif path == 'summed':
-            pathway = strongest_path_summed.strongest_path_summed(tree,graph,root)
+            pathway, strength = strongest_path_summed.strongest_path_summed(tree,graph,root)
         colormap_edges = []
         for edge in tree.edges:
             if(edge in pathway):
@@ -51,9 +52,10 @@ def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, pat
         xpathways.append(pathway)
         xcolormap_n.append(colormap_nodes)
         xcolormap_e.append(colormap_edges)
+        xstrengths.append(strength)
         xpos.append(pos)
 
-    return rnodes, xtrees, xpathways, xcolormap_n, xcolormap_e, xpos
+    return rnodes, xtrees, xpathways, xstrengths, xcolormap_n, xcolormap_e, xpos
 
 
 
