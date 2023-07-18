@@ -28,13 +28,12 @@ av_pathway_weights = {}
 strongest_pathway_weights = {}
 
 
-'''
 for edge_type in edge_types:
     te_thresh = 0.1
     graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
     g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
     nx.relabel_nodes(g, actors, copy=False)
-    xtrees, xpathways = generate_tree_data(g, edge_type, te_thresh, pathway_selection)
+    xtrees, xpathways, xstrengths = generate_tree_data(g, edge_type, te_thresh, pathway_selection)
     pathway_lens = []
     #for tree in xtrees:
     #    print(tree)
@@ -68,9 +67,6 @@ plt.xticks(range(len(longest_pathway_lengths)), names, rotation='vertical')
 plt.ylabel('path length')
 plt.title('Longest pathway length')
 plt.savefig('longest_path_lengths.png')
-'''
-
-
 
 # weights
 
@@ -104,7 +100,7 @@ plt.ion()
 plt.bar(range(len(av_pathway_weights)), values)
 plt.xticks(range(len(av_pathway_weights)), names, rotation='vertical')
 plt.ylabel('path weight')
-plt.title('Average pathway weightss')
+plt.title('Average pathway weights')
 plt.savefig('ave_path_weights.png')
 plt.clf()
 
@@ -119,19 +115,16 @@ plt.title('Strongest pathway weights')
 plt.savefig('strongest_path_weights.png')
 
 
-# TODO include the following traditional network metrics to run stat correlation against pathway metrics
-# num nodes
-# num edges
-# betweeness centrality
-# average degree
-# meta-labels?
+path_metrics_df = pd.DataFrame.from_dict([av_pathway_lengths, longest_pathway_lengths, av_pathway_weights, strongest_pathway_weights])
 
+print(path_metrics_df)
 
-# pathway metrics:
-# average pathway length
-# longest pathway length
-# average weight of pathway
-# highest weight of pathway
+path_metrics_transposed = path_metrics_df.T
 
+print(path_metrics_transposed)
+
+path_metrics_transposed.columns = ['av_path_length', 'longest_path_length', 'av_path_weight', 'strongest_path_weight']
+
+path_metrics_transposed.to_csv('path_metrics.csv')
 
 
