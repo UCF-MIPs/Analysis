@@ -3,13 +3,13 @@ import pandas as pd
 from . import te_rollout, htrees, plot_htrees
 
 
-def generate_tree_plots(g, edge_type, te_thresh, pathway_selection):
+def generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name):
 
     vis_lim = 2
     dep_lim = 7
     orig_nodes = g.nodes
-
-    root_nodes = [x for x in g.nodes() if g.out_degree(x) > 0]
+    if root_nodes is None:
+        root_nodes = [x for x in g.nodes() if g.out_degree(x) > 0]
     g_df = nx.to_pandas_edgelist(g, source='Source', target='Target')
     
     root_graphs = {}
@@ -25,7 +25,7 @@ def generate_tree_plots(g, edge_type, te_thresh, pathway_selection):
     # Save resulting tree plots
     print(ts_figs)
     for ax, root in zip(ts_figs, rnodes):
-        ax.figure.savefig(f'trees/{edge_type}_te_thresh{te_thresh}_root{root}.png')
+        ax.figure.savefig(f'{dir_name}/{edge_type}_te_thresh{te_thresh}_root{root}.png')
 
 
 def generate_tree_data(g, edge_type, te_thresh, pathway_type):

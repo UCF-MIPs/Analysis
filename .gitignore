@@ -1,4 +1,6 @@
 static-analysis/data/*
+static-analysis/trees/*
+static-analysis/graphs/*
 static-analysis/results/*
 static-analysis/old_results/*
 static-analysis/src/__pycache__
