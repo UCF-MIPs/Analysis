@@ -25,7 +25,10 @@ def generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, 
     # Save resulting tree plots
     print(ts_figs)
     for ax, root in zip(ts_figs, rnodes):
-        ax.figure.savefig(f'{dir_name}/{edge_type}_te_thresh{te_thresh}_root{root}.png')
+        if dir_name is not None:
+            ax.figure.savefig(f'{dir_name}/{edge_type}_te_thresh{te_thresh}_root{root}.png')
+        else: 
+            ax.figure.savefig(f'{edge_type}_te_thresh{te_thresh}_root{root}.png')
 
 
 def generate_tree_data(g, edge_type, te_thresh, pathway_type):
