@@ -1,8 +1,13 @@
 static-analysis/data/*
+static-analysis/trees/*
+static-analysis/graphs/*
 static-analysis/results/*
 static-analysis/old_results/*
 static-analysis/src/__pycache__
 static-analysis/__pycache__
+static-analysis/Ukraine_trees/*
+static-analysis/path_metrics.csv
+static-analysis/plots/*
 UFTM-classification/results/*
 UFTM-classification/data/*
 UFTM-classification/resources/*

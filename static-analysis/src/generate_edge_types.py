@@ -10,6 +10,6 @@ def generate_edge_types():
         for j in to_edges:
             edge_types.append(f"{i}_{j}")
 
-    edge_types.append('total_te')
+    #edge_types.append('total_te')
 
     return edge_types
