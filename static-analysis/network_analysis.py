@@ -17,6 +17,9 @@ edge_types = generate_edge_types.generate_edge_types()
 bc_node_values = {}
 bc_edge_values = {}
 
+bc_net = {}
+
+
 for edge_type in edge_types:
     print('Edge Type: ', edge_type)
     te_thresh = 0.1
@@ -65,9 +68,8 @@ for edge_type in edge_types:
     #print(degrees)
 
     # plots?
+    
 
-
-
-
+    
 
 

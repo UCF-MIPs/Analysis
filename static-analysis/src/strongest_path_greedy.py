@@ -4,7 +4,7 @@ def strongest_path_greedy(tree,graph,root):
     path selected by next strongest edge
     '''
     pathway = []
-    totalstrength = 0
+    total_strength = 0
     # Get layers from tree
     edges_from_source = tree.out_edges(root)
     out_edges = {}
@@ -27,11 +27,11 @@ def strongest_path_greedy(tree,graph,root):
             n = list(graph.get_edge_data(*i).values())
             out_edges[i]=n
         max_val = max(out_edges.values())
-        total_strength += max_val
+        total_strength += max_val[0]
         selection = (k for k, v in out_edges.items() if v== max_val)
         elem = [*selection]
         f,t = elem[0]
         pathway.append((f,t))
         in_node = t
-    return pathway, strength
+    return pathway, total_strength
 

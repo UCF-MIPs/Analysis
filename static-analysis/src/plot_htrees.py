@@ -15,7 +15,7 @@ def plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_th
     '''
     figs = []
     for tree, pathway, colormap_nodes, colormap_edges, pos in zip (xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos):
-        fig, ax = plt.subplots(figsize=(7,16))
+        fig, ax = plt.subplots(figsize=(6,11))
         nx.draw(tree, pos, node_color=colormap_nodes, edge_color=colormap_edges, with_labels=True, width=3, font_size=12, node_size=250, ax = ax)
         #short
         #fig = plt.figure(3,figsize=(20,20))
@@ -32,6 +32,8 @@ def plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_th
         line2 = mlin.Line2D([], [], color="white", marker='o', markersize=15, markerfacecolor="green")
         line3 = mlin.Line2D([], [], color="white", marker='o', markersize=15,  markerfacecolor="yellow")
         ax.legend((line1, line2, line3), ('Expanded', 'Terminal', 'Unexpanded'), numpoints=1, loc='lower right')
+        fig.tight_layout()
+        ax.margins(0.1)
         figs.append(ax)
     return figs
 
