@@ -39,10 +39,4 @@ rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = 
 
 print(xpos[0])
 
-for edge_type in edge_types:
-    
-
-
-
-
 

@@ -27,6 +27,8 @@ actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
     
 
 csv_name = 'data/Skripal/actor_te_edges_2018_03_01_2018_05_01.csv'
-sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'outdegree', csv_name)
-sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'bc', csv_name)
+#sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'outdegree', csv_name)
+#sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'bc', csv_name)
+#sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'num_nodes', csv_name)
+sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'num_edges', csv_name)
 

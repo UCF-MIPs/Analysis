@@ -1,11 +1,17 @@
-To create an environment including all necessary dependencies:
-'''
-conda env create -f env.yml
-'''
+#Modeling Influence Pathways (MIPs) analysis
 
-To do    
--test auto-thresholding   
--integrate betweenness-centrality based node importance function to automatically select root nodes
--simplify everything into basic functionality for use in the MIPs interface and place into core dir, only output trees and pathways, no plots
+## Contents:
+
+UFTM-classification - Classify news sources into one of four classes based on trustworthiness and popularity
+
+static-analysis - Generate network analytics, subgraphs, influence trees, and influence pathways given a weighted, directed network
+
+## Installation
+
+To create an environment including all necessary dependencies:
+```bash
+conda env create -f env.yml
+```
+
 
 

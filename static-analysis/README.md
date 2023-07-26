@@ -1,18 +1,25 @@
-basic functionality of static analysis for use in MIPs interface
+# Modeling Influence Pathways (MIPs) analysis
 
-Static analysis input and output
+## Usage
 
-input:
-actor list (csv) 
-TE network (csv)
-s = starting point type (most influential nodes/most influential edges), 
-n = number of starting points
-t = pathway selection method (none/greedy/summed path)
+For basic usage, run the main file.  
 
-output: 
-tree for each influence type in form of the following table:
-source, target, target count (how many times is the node repeated)
-dictionary of n pathways per tree 
-ex// {UF-TM: (edgelist1, edgelist2)}
-tree has embedded auto-threshold, label the value somewhere
+```bash
+
+python main.py
+
+```
+
+## Options
+
+Within the main file, functional and plotting options can be adjusted.
+
+To generate hierarchical acyclic tree plots for every possible root node:
+
+
+```python
+
+generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes=None)
+
+```
 
