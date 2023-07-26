@@ -2,6 +2,23 @@ import pandas as pd
 import networkx as nx 
 
 def te_rollout(in_root, in_edges_df, max_visits):
+    '''
+    Generates layer-wise propogation of edges in a network, 
+    avoids cycles with a duplicate node renaming scheme
+
+        Parameters:
+
+            in_root (str): name of root node
+
+            in_edges_df (Pandas DataFrame): df of original network
+
+            max_visits (int): Max number of times any node can be visited
+
+        Returns:
+
+            root_df (Pandas DataFrame): df created from edges from a certain root node
+
+    '''
     n=0
     visited = {}
     root_df = pd.DataFrame()

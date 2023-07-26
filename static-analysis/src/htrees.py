@@ -7,10 +7,42 @@ from collections import deque
 def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation
-    input:
+    
+        Parameters:
+
+            graphs (list): A list of networkx graphs, one per root node
+
+            edge_type (str): edge weight column name
+
+            te_thresh (float): minimum edge_weight threshold
+
+            visited_lim (int): Max number of visits to nodes. To be input into te_rollout
+
+            depth_lim (int): Max depth of the tree. To be input into te_rollout
+
+            orig_nodes (list): list of nodes from original network, 
+            used for duplicate node naming scheme
+
+        Returns:
+
+            rnodes (list): list of root nodes
+
+            xtrees ()
+
+            xpathways () 
+
+            xstrengths ()
+
+            xcolormap_n ()
+
+            xcolormap_e ()
+
+            xpos ()
+
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
+    #TODO finish docstring
     rnodes = []
     xtrees = []
     xpathways = []
