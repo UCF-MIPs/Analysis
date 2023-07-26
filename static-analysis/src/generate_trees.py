@@ -10,6 +10,7 @@ def generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, 
     orig_nodes = g.nodes
     if root_nodes is None:
         root_nodes = [x for x in g.nodes() if g.out_degree(x) > 0]
+    
     g_df = nx.to_pandas_edgelist(g, source='Source', target='Target')
     
     root_graphs = {}
@@ -31,13 +32,14 @@ def generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, 
             ax.figure.savefig(f'{edge_type}_te_thresh{te_thresh}_root{root}.png')
 
 
-def generate_tree_data(g, edge_type, te_thresh, pathway_type):
+def generate_tree_data(g, edge_type, te_thresh, pathway_type, root_nodes):
 
     vis_lim = 2
     dep_lim = 7
     orig_nodes = g.nodes
-
-    root_nodes = [x for x in g.nodes() if g.out_degree(x) > 0]
+    if root_nodes is None:
+        root_nodes = [x for x in g.nodes() if g.out_degree(x) > 0]
+    
     g_df = nx.to_pandas_edgelist(g, source='Source', target='Target')
     
     root_graphs = {}
@@ -49,5 +51,5 @@ def generate_tree_data(g, edge_type, te_thresh, pathway_type):
     # Generate tree information in for of lists (1 entry per root node)
     rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = htrees.htrees(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_type) 
 
-    return xtrees, xpathways, xstrengths
+    return rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos
 

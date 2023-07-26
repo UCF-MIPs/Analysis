@@ -9,7 +9,7 @@ from src import influential_node_ranking
 from src import influential_edge_ranking
 from src import generate_edge_types
 from src import generate_trees
-
+from src import contour_plot
       
 # Use in interface
 
@@ -27,11 +27,22 @@ graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
 nx.relabel_nodes(g, actors, copy=False)
 
+
 # Can replace 'influential_node_ranking with a single root node as a list
 # for example, root_nodes = ['Ian56789']
 root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=5, node_names=True)
 
-generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
- 
+print(root_nodes)
+#generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
+
+rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
+
+print(xpos[0])
+
+for edge_type in edge_types:
+    
+
+
+
 
 
