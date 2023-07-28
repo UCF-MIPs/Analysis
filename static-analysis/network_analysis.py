@@ -1,73 +1,95 @@
 import networkx as nx
 import pandas as pd
-import matplotlib.pyplot as plt
-from src import generate_edge_types, all_betweenness_centrality, in_out_degrees
-import numpy as np
-
-# Dataframe of TE network
-cascade_df = pd.read_csv('data/actor_te_edges_2018_03_01_2018_05_01.csv')
-cascade_df = cascade_df.loc[(cascade_df['Source'] > 1.) & (cascade_df['Target'] > 1.) & (cascade_df['Source']<101.) & (cascade_df['Target']<101.)]
-
-# Dict of actor names (v2/v4/dynamic)
-actor_df = pd.read_csv('data/actors_v4.csv')
-actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
-
-edge_types = generate_edge_types.generate_edge_types()
-
-bc_node_values = {}
-bc_edge_values = {}
-
-for edge_type in edge_types:
-    print('Edge Type: ', edge_type)
-    te_thresh = 0.1
-    graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
-    g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
-
-    ########### Calculating all betwenness centrality values and outputing distributions ###########
-    bc_node_list, bc_edge_list = all_betweenness_centrality.all_betweenness_centrality(g)
-
-    bc_node_mean = np.mean(bc_node_list)
-    bc_node_std = np.std(bc_node_list)
-    bc_edge_mean = np.mean(bc_edge_list)
-    bc_edge_std = np.std(bc_edge_list)
-
-    bc_node_values[edge_type] = bc_node_list
-    bc_edge_values[edge_type] = bc_edge_list
-
-    #print(bc_node_values)
-    #print(bc_edge_values)
-
-    # Create distribution plots for node betweenness centrality
-    plt.figure(figsize=(12,6))
-    plt.subplot(1, 2, 1)
-    plt.hist(bc_node_list, bins=20)
-    plt.title(edge_type + ' Node Betweenness Centrality Distribution')
-    plt.xlabel('Betweenness Centrality')
-    plt.ylabel('Frequency')
-    plt.text(0.8, 0.9, f'Mean: {bc_node_mean:.2f}\nStd: {bc_node_std:.2f}', transform=plt.gca().transAxes)
-    
-    # Create distribution plots for edge betweenness centrality
-    plt.subplot(1, 2, 2)
-    plt.hist(bc_edge_list, bins=20)
-    plt.title(edge_type + ' Edge Betweenness Centrality Distribution')
-    plt.xlabel('Betweenness Centrality')
-    plt.ylabel('Frequency')
-    plt.text(0.8, 0.9, f'Mean: {bc_edge_mean:.2f}\nStd: {bc_edge_std:.2f}', transform=plt.gca().transAxes)
-    fig_name = edge_type + '_bc_distribution.png'
-    plt.savefig('./bc_distributions/' + fig_name)
-    
-    plt.tight_layout()
-    #plt.show()
-
-    ########### Calculating average in-degree and out-degree all betwenness centrality values and outputing distributions ###########
-
-    degrees = in_out_degrees.compute_degrees(g)
-    #print(degrees)
-
-    # plots?
+from src import (plot_quadrant_bc, plot_quadrant_violins,
+                 generate_edge_types, compute_degrees_nodes_edges, plot_BC_hist_aggr,
+                 plot_network_degree_centrality, plot_violin_degrees_by_threshold, plot_total_nodes_edges_networks, 
+                 plot_network_BC, plot_violin_out_degree, plot_total_nodes_networks, plot_total_edges_networks, 
+                 plot_node_BC_dist, plot_edge_BC_dist, plot_quadrant_violins, plot_line_violins, plot_line_hist)
 
 
+class NetworkAnalysis:
+    def __init__(self, data_name, thresholds):
+        self.data_name = data_name
+        self.thresholds = thresholds
+        self.cascade_df = None
+        self.actor_df = None
+        self.actors = None
+        self.edge_types = None
+        self.graph_dict = None
+        self.all_degrees_dict = None
+
+    def load_data(self):
+        if self.data_name == 'skripal' or self.data_name == 'Skripal':
+            self.cascade_df = pd.read_csv(f'data/{self.data_name}/actor_te_edges_2018_03_01_2018_05_01.csv'.format(self.data_name))
+            self.cascade_df = self.cascade_df.loc[(self.cascade_df['Source'] > 1.) & (self.cascade_df['Target'] > 1.) & (self.cascade_df['Source']<101.) & (self.cascade_df['Target']<101.)]
+
+            self.actor_df = pd.read_csv(f'data/{self.data_name}/actors_v4.csv')
+            self.actors = dict(zip(self.actor_df.actor_id, self.actor_df.actor_label))
+
+            self.edge_types = generate_edge_types.generate_edge_types()
+
+        else:
+            self.cascade_df = pd.read_csv(f'data/{self.data_name}/Actor_TE_Edges_Ukraine_v1.csv'.format(self.data_name))
+            self.cascade_df = self.cascade_df.loc[(self.cascade_df['Source'] > 1.) & (self.cascade_df['Target'] > 1.) & (self.cascade_df['Source']<101.) & (self.cascade_df['Target']<101.)]
+
+            self.actor_df = pd.read_csv(f'data/{self.data_name}/actors_Ukraine_v1.csv')
+            self.actors = dict(zip(self.actor_df.actor_id, self.actor_df.actor_label))
+
+            self.edge_types = generate_edge_types.generate_edge_types()
 
 
+    def generate_graphs(self):
+        self.graph_dict = {}
+        for edge_type in self.edge_types:
+            self.graph_dict[edge_type] = {}
+            for te_thresh in self.thresholds:
+                graph_df = self.cascade_df.loc[(self.cascade_df[edge_type] > te_thresh)]
+                g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
+                self.graph_dict[edge_type][te_thresh] = g
+
+    def compute_all_degrees(self):
+        self.all_degrees_dict = {}
+        for edge_type, threshold_dict in self.graph_dict.items():
+            self.all_degrees_dict[edge_type] = {}
+            for threshold, graph in threshold_dict.items():
+                self.all_degrees_dict[edge_type][threshold] = compute_degrees_nodes_edges.compute_degrees_nodes_edges(graph)
+
+    def generate_plots(self):
+
+        ########### Bar plots of total edges and nodes ########### 
+
+        #plot_total_nodes_edges_networks.plot_total_nodes_edges_networks(self.graph_dict, self.data_name)
+        #plot_total_nodes_networks.plot_total_nodes_networks(self.graph_dict, self.data_name)
+        #plot_total_edges_networks.plot_total_edges_networks(self.graph_dict, self.data_name)
+
+        ########### Individual histograms of nodes and edges distributions ########### 
+
+        #plot_node_BC_dist.plot_node_BC_dist(self.graph_dict)
+        #plot_edge_BC_dist.plot_edge_BC_dist(self.graph_dict)
+
+        ########### Network graphs ########### 
+
+        #plot_network_BC.plot_network_BC(self.graph_dict, self.actors, self.data_name)
+        #plot_network_degree_centrality.plot_network_degree_centrality(self.graph_dict, self.actors, self.data_name)
+
+        ########### Aggregates ###########
+
+        #plot_line_violins.plot_line_violins(self.graph_dict, self.data_name)
+        #plot_line_hist.plot_line_hist(self.graph_dict, self.data_name)
+        #plot_BC_hist_aggr.plot_BC_hist_aggr(self.graph_dict)
+        plot_quadrant_violins.plot_quadrant_violins(self.graph_dict, self.data_name)
+        plot_quadrant_bc.plot_quadrant_bc(self.graph_dict, self.data_name)
+
+        #plot_violin_out_degree.plot_violin_out_degree(self.graph_dict)
+
+    #def generate_csv(self):
 
 
+def main():
+    net_analysis = NetworkAnalysis(data_name='skripal', thresholds=[0.01, 0.1, 0.15, 0.2])
+    net_analysis.load_data()
+    net_analysis.generate_graphs()
+    net_analysis.generate_plots()
+
+if __name__ == '__main__':
+    main()
