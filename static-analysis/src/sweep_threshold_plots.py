@@ -55,7 +55,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
                 graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
                 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 #nx.relabel_nodes(g, actors, copy=False)
-                bc_temp = sum(dict(nx.betweenness_centrality(g)).values())
+                bc_temp = np.mean((list(dict(nx.betweenness_centrality(g)).values())))
                 bc.append(bc_temp)
                 if(bc_temp > maxval):
                     maxval = bc_temp
@@ -68,7 +68,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             #yn_smooth = signal.savgol_filter(yn, 3, 5)
             ax.plot(te_threshes, yn)
             plt.xlabel('TE thresh')
-            plt.ylabel('sum of betweenness centrality')
+            plt.ylabel('average of betweenness centrality')
             plt.ylim(0, maxval)
             plt.xlim(0,xmax)
             plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')

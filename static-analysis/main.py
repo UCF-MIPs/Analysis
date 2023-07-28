@@ -9,13 +9,12 @@ from src import influential_node_ranking
 from src import influential_edge_ranking
 from src import generate_edge_types
 from src import generate_trees
-from src import contour_plot
       
 # Use in interface
 
 pathway_selection="greedy" # options: summed, greedy, or None
 edge_type = 'UM_TM'
-te_thresh = 0.1
+te_thresh = 0.5
 
 cascade_df = pd.read_csv('data/Ukraine/Actor_TE_Edges_Ukraine_v1.csv', usecols=['Source', 'Target', edge_type])
 actor_df = pd.read_csv('data/Ukraine/actors_Ukraine_v1.csv')
@@ -30,13 +29,15 @@ nx.relabel_nodes(g, actors, copy=False)
 
 # Can replace 'influential_node_ranking with a single root node as a list
 # for example, root_nodes = ['Ian56789']
-root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=5, node_names=True)
+
+#root_nodes = influential_node_ranking.influential_node_ranking_outdegree(g, pulltop=5, node_names=True)
+root_nodes = influential_node_ranking.influential_node_ranking_bc(g, pulltop=5, node_names=True)
 
 print(root_nodes)
-#generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
+generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
 
-rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
+#rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
 
-print(xpos[0])
+#print(xpos[0])
 
 
