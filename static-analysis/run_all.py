@@ -15,7 +15,8 @@ from src import generate_trees
 pathway_selection="greedy" # options: summed, greedy, or None
 #edge_type = 'UM_TM'
 #edge_types = generate_edge_types.generate_edge_types()
-edge_types = ['UM_TM', 'UF_TM', 'UF_TF', 'UM_TF']
+#edge_types = ['UM_TM', 'UF_TM', 'UF_TF', 'UM_TF']
+edge_types = ['TM_UM', 'TM_UF', 'TF_UM', 'TM_UF']
 te_threshes = [0.025, 0.05, 0.075, 0.1]
 
 for edge_type in edge_types:
@@ -43,7 +44,7 @@ for edge_type in edge_types:
         print(root_nodes)
         #generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
 
-        generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name='Ukraine_trees_outdeg_selc')
+        generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name='Ukraine_trees_outdeg_selc2')
         #rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
 
 
