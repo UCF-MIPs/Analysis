@@ -15,14 +15,15 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
     metric: str - y axis metric
     '''
     y = {}
+    figs = []
     if(metric=='outdegree'):
         maxval = 0
         xmax = 0
         for edge_type in edge_types:
             out_degree = []
             for te_thresh in te_threshes:
-                cascade_df = pd.read_csv(csv_name, usecols=['Source', 'Target', edge_type])
-                graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
+                iter_csv = pd.read_csv(csv_name, iterator=True, chunksize=1000, usecols=['Source', 'Target', edge_type])
+                graph_df = pd.concat([chunk[chunk[edge_type] > te_thresh] for chunk in iter_csv])
                 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 #nx.relabel_nodes(g, actors, copy=False)
                 deg = sum(dict(g.out_degree()).values())
@@ -38,12 +39,16 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             yn = np.asarray(y[edge_type])
             #yn_smooth = signal.savgol_filter(yn, 11, 3)
             ax.plot(te_threshes, yn)
-            plt.xlabel('TE thresh')
-            plt.ylabel('sum of out degree')
-            plt.ylim(0,maxval)
-            plt.xlim(0, xmax)
-            plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-    
+            
+            #ax.plt.xlabel('TE thresh')
+            #ax.plt.ylabel('sum of out degree')
+            #ax.plt.ylim(0,maxval)
+            #ax.plt.xlim(0, xmax)
+            #plt.xlim(0, xmax)
+            
+            figs.append(ax)
+            #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
+    return figs
 
     if(metric=='bc'):
         maxval = 0
@@ -51,8 +56,8 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
         for edge_type in edge_types:
             bc = []
             for te_thresh in te_threshes:
-                cascade_df = pd.read_csv(csv_name, usecols=['Source', 'Target', edge_type])
-                graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
+                iter_csv = pd.read_csv(csv_name, iterator=True, chunksize=1000, usecols=['Source', 'Target', edge_type])
+                graph_df = pd.concat([chunk[chunk[edge_type] > te_thresh] for chunk in iter_csv])
                 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 #nx.relabel_nodes(g, actors, copy=False)
                 bc_temp = np.mean((list(dict(nx.betweenness_centrality(g)).values())))
@@ -67,12 +72,14 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             yn = np.asarray(y[edge_type])
             #yn_smooth = signal.savgol_filter(yn, 3, 5)
             ax.plot(te_threshes, yn)
-            plt.xlabel('TE thresh')
-            plt.ylabel('average of betweenness centrality')
-            plt.ylim(0, maxval)
-            plt.xlim(0,xmax)
-            plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-    
+            #plt.xlabel('TE thresh')
+            #plt.ylabel('average of betweenness centrality')
+            #plt.ylim(0, maxval)
+            #plt.xlim(0,xmax)
+            #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
+            figs.append(ax)
+    return figs
+
 
     if(metric=='num_nodes'):
         maxval = 0
@@ -80,8 +87,8 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
         for edge_type in edge_types:
             num_nodes = []
             for te_thresh in te_threshes:
-                cascade_df = pd.read_csv(csv_name, usecols=['Source', 'Target', edge_type])
-                graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
+                iter_csv = pd.read_csv(csv_name, iterator=True, chunksize=1000, usecols=['Source', 'Target', edge_type])
+                graph_df = pd.concat([chunk[chunk[edge_type] > te_thresh] for chunk in iter_csv])
                 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 #nx.relabel_nodes(g, actors, copy=False)
                 num_nodes_temp = g.number_of_nodes()
@@ -96,12 +103,13 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             yn = np.asarray(y[edge_type])
             #yn_smooth = signal.savgol_filter(yn, 3, 5)
             ax.plot(te_threshes, yn)
-            plt.xlabel('TE thresh')
-            plt.ylabel('number of nodes')
-            plt.ylim(0, maxval)
-            plt.xlim(0, xmax)
-            plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-
+            #plt.xlabel('TE thresh')
+            #plt.ylabel('number of nodes')
+            #plt.ylim(0, maxval)
+            #plt.xlim(0, xmax)
+            #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
+            figs.append(ax)
+    return figs
 
     if(metric=='num_edges'):
         maxval = 0
@@ -109,8 +117,8 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
         for edge_type in edge_types:
             num_edges = []
             for te_thresh in te_threshes:
-                cascade_df = pd.read_csv(csv_name, usecols=['Source', 'Target', edge_type])
-                graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
+                iter_csv = pd.read_csv(csv_name, iterator=True, chunksize=1000, usecols=['Source', 'Target', edge_type])
+                graph_df = pd.concat([chunk[chunk[edge_type] > te_thresh] for chunk in iter_csv])
                 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
                 #nx.relabel_nodes(g, actors, copy=False)
                 num_edges_temp = g.number_of_edges()
@@ -125,12 +133,13 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             yn = np.asarray(y[edge_type])
             #yn_smooth = signal.savgol_filter(yn, 3, 5)
             ax.plot(te_threshes, yn)
-            plt.xlabel('TE thresh')
-            plt.ylabel('number of edges')
-            plt.ylim(0, maxval)
-            plt.xlim(0, xmax)
-            plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-
+            #plt.xlabel('TE thresh')
+            #plt.ylabel('number of edges')
+            #plt.ylim(0, maxval)
+            #plt.xlim(0, xmax)
+            #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
+            figs.append(ax)
+    return figs
 
 
 

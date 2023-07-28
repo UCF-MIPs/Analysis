@@ -11,6 +11,7 @@ from src import influential_edge_ranking
 from src import generate_edge_types
 from src import generate_trees
 from src import sweep_threshold_plots
+from src import plot_quadrant
 
 edge_types = generate_edge_types.generate_edge_types()
 #edge_type = 'UM_TM'
@@ -27,8 +28,18 @@ actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
     
 
 csv_name = 'data/Skripal/actor_te_edges_2018_03_01_2018_05_01.csv'
-#sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'outdegree', csv_name)
-sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'bc', csv_name)
+plots = sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'outdegree', csv_name)
+
+plot_quadrant.plot_quadrant(plots, 'sweep-outdegree')
+
+#sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'bc', csv_name)
 #sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'num_nodes', csv_name)
 #sweep_threshold_plots.plot_all_sweep(te_threshes, edge_types, 'num_edges', csv_name)
+
+
+
+
+
+
+
 

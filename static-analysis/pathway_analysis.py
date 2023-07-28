@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 # input variables
 pathway_selection = "greedy"
 edge_types = generate_edge_types.generate_edge_types() 
+#edge_types.remove('TM_TM')
 
 av_pathway_lengths = {}
 longest_pathway_lengths = {}
