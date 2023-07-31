@@ -46,7 +46,8 @@ def te_rollout(in_root, in_edges_df, max_visits):
                 e.loc[nodepos, ['Target']] = new_node
         visited_cap = set([k for k, v in visited.items() if v > max_visits])
         e = e[~e['Target'].isin(visited_cap)]
-        root_df = root_df.append(e, ignore_index=True)
+        #root_df = root_df.append(e, ignore_index=True) pandas < 2.0.3
+        root_df = pd.concat([root_df, e], ignore_index=True) # pandas = 2.0.3
         this_level_nodes = set(e['Target'].to_list()).difference(visited_cap)
     return root_df
     

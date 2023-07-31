@@ -14,21 +14,42 @@ from src import generate_trees
 pathway_selection="greedy" # options: summed, greedy, or None
 edge_type = 'UF_TM'
 te_thresh = 0.1
+node_rank = 'outdegree'
+dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
+
+# Data
+skrip_v4_te = 'data/Skripal/v4/indv_network/actor_te_edges_2018_03_01_2018_05_01.csv'
+skrip_v4_act = 'data/Skripal/v4/indv_network/actors_v4.csv'
+# note for skrip v3, need to filter last 10 actors (platforms) like so
+#cascade_df = cascade_df.loc[(cascade_df['Source'] > 1.) & (cascade_df['Target'] > 1.) & (cascade_df['Source']<101.) & (cascade_df['Target']<101.)]
+
+skrip_v7_te = 'data/Skripal/v7/indv_network/actor_te_edges_df.csv'
+skrip_v7_act = 'data/Skripal/v7/indv_network/actors_df.csv'
+
+ukr_v1_te = 'data/Ukraine/v1/Actor_TE_Edges_Ukraine_v1.csv'
+ukr_v1_act = 'data/Ukraine/v1/actors_Ukraine_v1.csv'
+
+ukr_v3_te = 'data/Ukraine/v3/dynamic/actor_te_edges_df_2022_01_01_2022_05_01.csv'
+ukr_v3_act = 'data/Ukraine/v3/dynamic/actors_df.csv'
+
+te_df_name = f'{dataset}_te'
+act_df_name = f'{dataset}_act'
+myvars = locals()
+te_df_path = myvars[te_df_name]
+act_df_path = myvars[act_df_name]
+
+# Results dir
+dir_name = f'results/{dataset}_{node_rank}_{pathway_selection}'
+path = Path(dir_name)
+path.mkdir(parents=True, exist_ok=True)
+
 
 #UKRAINE
-iter_csv = pd.read_csv('data/Ukraine/Actor_TE_Edges_Ukraine_v1.csv', iterator=True, chunksize=1000, usecols=['Source', 'Target', edge_type])
-graph_df = pd.concat([chunk[chunk[edge_type] > te_thresh] for chunk in iter_csv])
-actor_df = pd.read_csv('data/Ukraine/actors_Ukraine_v1.csv')
-actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
-
-#SKRIPAL
-#cascade_df = pd.read_csv('data/Skripal/actor_te_edges_2018_03_01_2018_05_01.csv', usecols=['Source', 'Target', edge_type])
-#cascade_df = cascade_df.loc[(cascade_df['Source'] > 1.) & (cascade_df['Target'] > 1.) & (cascade_df['Source']<101.) & (cascade_df['Target']<101.)]
-#actor_df = pd.read_csv('data/Skripal/actors_v4.csv')
-#actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
-
+iter_csv = pd.read_csv(te_df_path, iterator=True, chunksize=1000, usecols=['Source', 'Target', edge_type])
 #te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 120, return_df=True)
-#graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
+graph_df = pd.concat([chunk[chunk[edge_type] > te_thresh] for chunk in iter_csv])
+actor_df = pd.read_csv(act_df_path)
+actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
 
 g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
 nx.relabel_nodes(g, actors, copy=False)

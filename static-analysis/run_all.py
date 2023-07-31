@@ -50,12 +50,11 @@ path.mkdir(parents=True, exist_ok=True)
 for edge_type in edge_types:
     for te_thresh in te_threshes:
         
-        cascade_df = pd.read_csv(te_df_path, usecols=['Source', 'Target', edge_type])
+        iter_csv = pd.read_csv(te_df_path, iterator=True, chunksize = 1000, usecols=['Source', 'Target', edge_type])
+        #te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 120, return_df=True)
+        graph_df = pd.concat([chunk[edge_type] > te_thresh for chunk in iter_csv])
         actor_df = pd.read_csv(act_df_path)
         actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
-
-        #te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 120, return_df=True)
-        graph_df = cascade_df.loc[(cascade_df[edge_type] > te_thresh)]
 
         g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
         nx.relabel_nodes(g, actors, copy=False)
@@ -67,7 +66,6 @@ for edge_type in edge_types:
         if node_rank == 'bc':
             root_nodes = influential_node_ranking.influential_node_ranking_bc(g, pulltop=5, node_names=True)
 
-        #generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
         generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=dir_name)
         #rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
 
