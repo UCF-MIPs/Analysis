@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # input variables
 pathway_selection = "greedy"
 edge_types = generate_edge_types.generate_edge_types() 
-#edge_types.remove('TM_TM')
+edge_types.remove('TM_TM')
 
 av_pathway_lengths = {}
 longest_pathway_lengths = {}
@@ -18,7 +18,7 @@ infl_df = pd.DataFrame(edge_types, columns = ['infl_type'])
 
 print(infl_df)
 
-te_threshes = [0.05, 0.075, 0.1]
+te_threshes = [0.025, 0.05, 0.075, 0.1]
 
 for te_thresh in te_threshes:
     for edge_type in edge_types:    
