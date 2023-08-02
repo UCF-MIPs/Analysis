@@ -1,6 +1,7 @@
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 from src import auto_threshold
 from src import te_rollout
 from src import htrees
@@ -12,9 +13,9 @@ from src import generate_trees
       
 # Use in interface
 pathway_selection="greedy" # options: summed, greedy, or None
-edge_type = 'UF_TM'
-te_thresh = 0.1
-node_rank = 'outdegree'
+edge_type = 'TM_TM'
+te_thresh = 0.3
+node_rank = 'bc'
 dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
 
 # Data
@@ -57,14 +58,13 @@ nx.relabel_nodes(g, actors, copy=False)
 # Can replace 'influential_node_ranking with a single root node as a list
 # for example, root_nodes = ['Ian56789']
 
-#root_nodes = influential_node_ranking.influential_node_ranking_outdegree(g, pulltop=5, node_names=True)
-#root_nodes = influential_node_ranking.influential_node_ranking_bc(g, pulltop=5, node_names=False)
-root_nodes = influential_node_ranking.influential_node_ranking_outdegree(g, pulltop=5, node_names=False)
+# note: if using generate_trees, node_names must be set to True
+root_nodes = influential_node_ranking.influential_node_ranking_outdegree(g, pulltop=5, node_names=True)
 
 print(f'{te_thresh} {edge_type}')
 print(root_nodes)
 
-#generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
+generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
 
 #rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
 

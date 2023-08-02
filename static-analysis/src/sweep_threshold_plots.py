@@ -15,7 +15,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
     metric: str - y axis metric
     '''
     y = {}
-    figs = []
+    figs = {}
     if(metric=='outdegree'):
         maxval = 0
         xmax = 0
@@ -30,7 +30,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
                 out_degree.append(deg)
                 if(deg > maxval):
                     maxval=deg
-                if(deg is not 0 and te_thresh > xmax):
+                if(deg != 0 and te_thresh > xmax):
                     xmax = te_thresh
             y[edge_type] = out_degree
         for edge_type in edge_types:
@@ -46,7 +46,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             #ax.plt.xlim(0, xmax)
             #plt.xlim(0, xmax)
             
-            figs.append(ax)
+            figs[edge_type] = ax
             #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
     return figs
 
@@ -64,7 +64,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
                 bc.append(bc_temp)
                 if(bc_temp > maxval):
                     maxval = bc_temp
-                if(bc_temp is not 0 and te_thresh > xmax):
+                if(bc_temp != 0 and te_thresh > xmax):
                     xmax = te_thresh
             y[edge_type] = bc
         for edge_type in edge_types:
@@ -77,7 +77,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             #plt.ylim(0, maxval)
             #plt.xlim(0,xmax)
             #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-            figs.append(ax)
+            figs[edge_type] = ax
     return figs
 
 
@@ -95,7 +95,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
                 num_nodes.append(num_nodes_temp)
                 if(num_nodes_temp > maxval):
                     maxval = num_nodes_temp
-                if(num_nodes_temp is not 0 and te_thresh > xmax):
+                if(num_nodes_temp != 0 and te_thresh > xmax):
                     xmax = te_thresh
             y[edge_type] = num_nodes
         for edge_type in edge_types:
@@ -108,7 +108,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             #plt.ylim(0, maxval)
             #plt.xlim(0, xmax)
             #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-            figs.append(ax)
+            figs[edge_type] = ax
     return figs
 
     if(metric=='num_edges'):
@@ -125,7 +125,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
                 num_edges.append(num_edges_temp)
                 if(num_edges_temp > maxval):
                     maxval = num_edges_temp
-                if(num_edges_temp is not 0 and te_thresh > xmax):
+                if(num_edges_temp != 0 and te_thresh > xmax):
                     xmax = te_thresh
             y[edge_type] = num_edges
         for edge_type in edge_types:
@@ -138,7 +138,7 @@ def plot_all_sweep(te_threshes, edge_types, metric, csv_name):
             #plt.ylim(0, maxval)
             #plt.xlim(0, xmax)
             #plt.savefig(f'{edge_type}_{metric}_thresh_sweep.png')
-            figs.append(ax)
+            figs[edge_type] = ax
     return figs
 
 

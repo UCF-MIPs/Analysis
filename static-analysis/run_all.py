@@ -15,9 +15,9 @@ from src import generate_trees
 # Use in interface
 
 pathway_selection="greedy" # options: summed, greedy, or None
-#edge_type = 'UM_TM'
-edge_types = generate_edge_types.generate_edge_types()
-te_threshes = [0.075, 0.1]
+edge_types = ['TF_TM']
+#edge_types = generate_edge_types.generate_edge_types()
+te_threshes = [0.1, 0.125, 0.15]
 node_rank = 'outdegree'
 dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
 
@@ -50,13 +50,19 @@ path.mkdir(parents=True, exist_ok=True)
 for edge_type in edge_types:
     for te_thresh in te_threshes:
         
-        iter_csv = pd.read_csv(te_df_path, iterator=True, chunksize = 1000, usecols=['Source', 'Target', edge_type])
-        #te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 120, return_df=True)
-        graph_df = pd.concat([chunk[edge_type] > te_thresh for chunk in iter_csv])
+        #te_thresh, graph_df = auto_threshold.auto_threshold(cascade_df, edge_type, 120, return_df=True) 
+        graph_df = pd.DataFrame() 
+        for chunk in pd.read_csv(te_df_path, chunksize=1000, usecols=['Source', 'Target', edge_type]):
+            new_chunk = chunk[chunk[edge_type] > te_thresh]
+            graph_df = pd.concat([graph_df, new_chunk])
+
+
         actor_df = pd.read_csv(act_df_path)
         actors = dict(zip(actor_df.actor_id, actor_df.actor_label))
 
-        g = nx.from_pandas_edgelist(graph_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
+        print(graph_df)
+
+        g = nx.from_pandas_edgelist(graph_df, source='Source', target='Target', edge_attr=[edge_type], create_using=nx.DiGraph())
         nx.relabel_nodes(g, actors, copy=False)
 
         # Can replace 'influential_node_ranking with a single root node as a list
