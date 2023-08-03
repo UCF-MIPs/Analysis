@@ -39,10 +39,13 @@ def generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, 
     
     root_graphs = {}
     for in_root in root_nodes:
-        root_df = te_rollout.te_rollout(in_root, g_df, vis_lim)
-        g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
-        root_graphs.update({in_root:g})
-
+        try:
+            root_df = te_rollout.te_rollout(in_root, g_df, vis_lim)
+            g = nx.from_pandas_edgelist(root_df, 'Source', 'Target', [edge_type], create_using=nx.DiGraph())
+            root_graphs.update({in_root:g})
+        except:
+            print("TE rollout error, root not in df")
+ 
     # Generate tree information in for of lists (1 entry per root node)
     rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = htrees.htrees(root_graphs, edge_type, te_thresh, vis_lim, dep_lim, orig_nodes, path=pathway_selection) 
     ts_figs = plot_htrees.plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type)
