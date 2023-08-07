@@ -9,7 +9,7 @@ def plot_edge_BC_dist(graph_dict):
 
     for edge_type, te_dict in graph_dict.items():
         for te_thresh, graph in te_dict.items():
-            bc_edge = nx.edge_betweenness_centrality(graph)
+            bc_edge = nx.edge_betweenness_centrality(graph, normalized=False)
             
             if not bc_edge:
                 print(f'The graph for {edge_type} at threshold {te_thresh} has no edges. Skipping the graph.')

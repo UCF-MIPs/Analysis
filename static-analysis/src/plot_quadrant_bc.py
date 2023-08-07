@@ -38,7 +38,7 @@ def plot_quadrant_bc(graph_dict, data_name):
                 axs[i, j].set_title(cell_title, fontsize = 11, fontweight='bold', y=0.8)
 
                 graph = graph_dict[cell_title].get(te_thresh, nx.DiGraph())
-                centrality = nx.betweenness_centrality(graph)
+                centrality = nx.betweenness_centrality(graph, normalized=False)
                 df = pd.DataFrame({"Betweenness Centrality": list(centrality.values()), "Edge Type": [cell_title]*len(centrality)})
                 df["Betweenness Centrality"] = (df["Betweenness Centrality"] - df["Betweenness Centrality"].min()) / (df["Betweenness Centrality"].max() - df["Betweenness Centrality"].min())
 

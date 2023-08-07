@@ -36,7 +36,7 @@ def plot_line_hist(graph_dict, data_name):
                 axs[i, j].set_title(cell_title, fontsize = 15, fontweight='bold', y=0.8)
 
                 graph = graph_dict[cell_title].get(te_thresh, nx.DiGraph())
-                bc_values = nx.betweenness_centrality(graph).values()  # compute betweenness centrality
+                bc_values = nx.betweenness_centrality(graph, normalized=False).values()  # compute betweenness centrality
                 df = pd.DataFrame({"Betweenness Centrality": bc_values, "Edge Type": [cell_title]*len(bc_values)})
                 df["Betweenness Centrality"] = (df["Betweenness Centrality"] - df["Betweenness Centrality"].min()) / (df["Betweenness Centrality"].max() - df["Betweenness Centrality"].min())
                 
@@ -60,5 +60,5 @@ def plot_line_hist(graph_dict, data_name):
         fig.text(0.4, 0.06, 'Betweenness Centrality Values', va='center', rotation='horizontal', fontsize=16)
         fig.text(0.01, 0.5, 'Count', va='center', rotation='vertical', fontsize=16)
         fig.text(0.15, 0.02, f'Threshold: {te_thresh}        Data: {data_name}       Plot Type: Betweenness Centrality Histogram', va='center', rotation='horizontal', fontsize=20)
-        fig_name = f'bc_thresh_{te_thresh}.png'
+        fig_name = f'line_aggr_bc_thresh_{te_thresh}.png'
         plt.savefig(f'./aggregates/{fig_name}')

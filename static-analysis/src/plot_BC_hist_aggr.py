@@ -27,7 +27,7 @@ def plot_BC_hist_aggr(graph_dict):
             G = sub_dict[threshold]
             
             # Calculate betweenness centrality for each node in the current graph
-            betweenness = nx.betweenness_centrality(G)
+            betweenness = nx.betweenness_centrality(G, normalized=False)
             
             # Convert betweenness values to a DataFrame
             df = pd.DataFrame({"Betweenness": list(betweenness.values())})

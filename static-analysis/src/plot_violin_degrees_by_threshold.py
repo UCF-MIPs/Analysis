@@ -1,8 +1,12 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import os
 
 def plot_violin_degrees_by_threshold(graph_dict):
+
+    if not os.path.exists('./degree_plots/'):
+        os.makedirs('./degree_plots/')
     
     #color_dict = {'UF': '#1ABC9C', 'UM': '#F1C40F', 'TF': '#E84393', 'TM': '#27AE60', 'to' : '#E74C3C'}
     

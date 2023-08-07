@@ -4,7 +4,7 @@ import pandas as pd
 import networkx as nx
 import os
 
-def plot_line_violins(graph_dict, data_name):
+def plot_line_boxes(graph_dict, data_name):
     if not os.path.exists('./aggregates/'):
         os.makedirs('./aggregates/')
         
@@ -29,19 +29,14 @@ def plot_line_violins(graph_dict, data_name):
 
         for i in range(4):
             df = pd.DataFrame()  # initialize dataframe
-            df_list = []
             for cell_title in quadrant_cells[i]:
                 graph = graph_dict[cell_title].get(te_thresh, nx.DiGraph())
-                degrees = [d for n, d in graph.out_degree()]
-                df_list.append(pd.DataFrame({"Degree": degrees, "Edge Type": [cell_title]*len(degrees)}))
-
-            df = pd.concat(df_list)
-
+                centrality_values = list(nx.betweenness_centrality(graph, normalized=False).values())
+                df = df.append(pd.DataFrame({"Centrality": centrality_values, "Edge Type": [cell_title]*len(centrality_values)}))
 
             if not df.empty:
-                #axs[i].grid(False)
                 axs[i].grid(True, alpha=0.5)
-                sns.violinplot(x="Edge Type", y="Degree", data=df, palette=color_dict, dodge=False, ax=axs[i])
+                sns.boxplot(x="Edge Type", y="Centrality", data=df, palette=color_dict, ax=axs[i])
             else:
                 print(f"No data for {quadrant_titles[i]} at threshold {te_thresh}, skipping plot.")
                 axs[i].set_xticks(range(len(quadrant_cells[i])))
@@ -55,19 +50,16 @@ def plot_line_violins(graph_dict, data_name):
             axs[i].set_xticklabels(quadrant_cells[i])  # Set the labels of the x-ticks to be the cell titles
             
         axs[3].set_xlabel('Network Type', fontsize = 16)
-        fig.text(0.01, 0.5, 'Out Degrees', va='center', rotation='vertical', fontsize=16)
-   
+        fig.text(0.01, 0.5, 'Betweenness Centrality', va='center', rotation='vertical', fontsize=16)
 
         # Create custom legend
         legend_elements = [plt.Line2D([0], [0], marker='x', color='w', markerfacecolor='black', markersize=15),
                            plt.Line2D([0], [0], marker='x', color='w', markerfacecolor='black', markersize=15),
                            plt.Line2D([0], [0], marker='x', color='w', markerfacecolor='black', markersize=15)]
-        axs[3].legend(legend_elements, [f'Threshold: {te_thresh}', f'Data: {data_name}', 'Plot Type: Out-Degree Violin Plot'],
-                      loc='lower center', bbox_to_anchor=(0.47, -0.4), fancybox=True, shadow=True, ncol=5, fontsize = 13)
+        axs[3].legend(legend_elements, [f'Threshold: {te_thresh}', f'Data: {data_name}', 'Plot Type: Betweenness Centrality Box Plot'],
+                      loc='lower center', bbox_to_anchor=(0.44, -0.4), fancybox=True, shadow=True, ncol=5, fontsize = 13)
 
         #plt.tight_layout()
-        fig_name = f'out_degree_thresh_{te_thresh}.png'
+        fig_name = f'line_bc_box_thresh_{te_thresh}.png'
         plt.savefig(f'./aggregates/{fig_name}')
         #plt.show()
-
-

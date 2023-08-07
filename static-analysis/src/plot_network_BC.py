@@ -16,7 +16,7 @@ def plot_network_BC(graph_dict, actors, data_name):
                 print(f'The graph for {edge_type} at threshold {te_thresh} has no nodes or edges. Skipping this graph.')
                 continue
             G1 = nx.relabel_nodes(G, actors)
-            measures = nx.betweenness_centrality(G1, normalized=True)
+            measures = nx.betweenness_centrality(G1, normalized=False)
 
              # Generate the position layout
             pos = nx.spiral_layout(G1)

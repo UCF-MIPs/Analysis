@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import os
+import networkx as nx
 from matplotlib.patches import Patch
 
-def plot_violin_out_degree(graph_dict):
+def plot_violin_BC(graph_dict):
 
-    if not os.path.exists('./degree_plots/'):
-        os.makedirs('./degree_plots/')
+    if not os.path.exists('./bc_plots/'):
+        os.makedirs('./bc_plots/')
 
     color_dict = {'UF_UF': '#1ABC9C', 'UM_UM': '#1ABC9C', 'TF_TF': '#1ABC9C', 'TM_TM': '#1ABC9C',
                   'TM_TF': '#F1C40F', 'TF_TM': '#F1C40F', 'UM_UF': '#F1C40F', 'UF_UM': '#F1C40F',
@@ -32,9 +33,9 @@ def plot_violin_out_degree(graph_dict):
     plt.style.use('seaborn')
     for edge_type, threshold_dict in graph_dict.items():
         for te_thresh, graph in threshold_dict.items():
-            degrees = [d for n, d in graph.out_degree()]
-            color_mapping = color_mapping = [edge_type]*len(degrees)
-            all_data.append((te_thresh, degrees, edge_type, color_mapping))
+            centralities = list(nx.betweenness_centrality(graph, normalized=False).values())
+            color_mapping = [edge_type]*len(centralities)
+            all_data.append((te_thresh, centralities, edge_type, color_mapping))
 
     all_data = [item for item in all_data if item[2] != 'total_te']
 
@@ -42,18 +43,18 @@ def plot_violin_out_degree(graph_dict):
     thresholds = set([item[0] for item in all_data])
 
     for te_thresh in thresholds:
-        degree_values = []
+        centrality_values = []
         all_edge_types = []
         color_mapping = []
 
         # gather data for this threshold
         for item in all_data:
             if item[0] == te_thresh:
-                degree_values.extend(item[1])
+                centrality_values.extend(item[1])
                 all_edge_types.extend([item[2]]*len(item[1]))
                 color_mapping.extend(item[3])
         
-        df = pd.DataFrame({"Degree": degree_values, "Edge Type": all_edge_types, "Color": color_mapping})
+        df = pd.DataFrame({"Betweenness Centrality": centrality_values, "Edge Type": all_edge_types, "Color": color_mapping})
 
         # Create a template DataFrame with all possible edge types excluding 'total_te'
         edge_types_template = pd.DataFrame({"Edge Type": [edge_type for edge_type in graph_dict.keys() if edge_type != 'total_te']})
@@ -64,15 +65,15 @@ def plot_violin_out_degree(graph_dict):
         plt.yscale('log')
         plt.grid(True, alpha = 0.3)
         plt.figure(figsize=(20, 5))
-        ax = sns.violinplot(x="Edge Type", y="Degree", hue="Color", data=df, palette=color_dict, dodge=False, order=order_list)
-        plt.title(f'Out Degree by Network Type with Threshold {te_thresh}')
-        plt.ylabel('Out Degree Value')
+        ax = sns.violinplot(x="Edge Type", y="Betweenness Centrality", hue="Color", data=df, palette=color_dict, dodge=False, order=order_list)
+        plt.title(f'Betweenness Centrality by Network Type with Threshold {te_thresh}')
+        plt.ylabel('Betweenness Centrality Value')
         plt.tight_layout()
 
         # handle legends
         ax.get_legend().remove()  # remove original legend
         plt.legend(handles=legend_patches)  # add custom legend
 
-        fig_name = f'thresh_{str(te_thresh)}_violin_degree.png'
-        plt.savefig(f'./degree_plots/{fig_name}')
+        fig_name = f'thresh_{str(te_thresh)}_violin_centrality.png'
+        plt.savefig(f'./bc_plots/{fig_name}')
         plt.close()

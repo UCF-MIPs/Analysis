@@ -2,8 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D 
+import os
 
 def plot_total_nodes_networks(graph_dict, data_name):
+
+    if not os.path.exists('./totals/'):
+        os.makedirs('./totals/')
+    
     result_dict = {}
 
     # calculate total number of nodes and edges from graphs in graph_dict
@@ -51,8 +56,7 @@ def plot_total_nodes_networks(graph_dict, data_name):
         # Plot the total number of nodes and edges per edge type
         ax.bar(range(len(all_edge_types)), total_nodes, bar_width, color=colors)
 
-        #ax.set_yscale('log')
-        plt.xticks(rotation = 45)
+        ax.set_yscale('log')
         ax.set_xlabel('Edge Types')
         ax.set_ylabel('Count')
         ax.grid(True)
