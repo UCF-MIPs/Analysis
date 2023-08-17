@@ -17,8 +17,7 @@ from src import generate_trees
 pathway_selection="greedy" # options: summed, greedy, or None
 #edge_type = 'UM_TM'
 edge_types = generate_edge_types.generate_edge_types()
-te_threshes = [0.05, 0.1, 0.15]
-node_rank = 'outdegree'
+te_threshes = [0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2]
 datasets = ['skrip_v4', 'skrip_v7', 'ukr_v1', 'ukr_v3'] # options: skrip_v4, skrip_v7, ukr_v3
 
 

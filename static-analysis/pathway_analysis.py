@@ -9,10 +9,10 @@ from pathlib import Path
 # input variables
 pathway_selection = "greedy"
 edge_types = generate_edge_types.generate_edge_types() 
-edge_types.remove('TM_TM')
-te_threshes = [0.025, 0.05, 0.075, 0.1]
+#edge_types.remove('TM_TM')
+te_threshes = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
 node_rank = 'outdegree'
-dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
+dataset = 'skrip_v7' # options: skrip_v4, skrip_v7, ukr_v3
 
 # Data
 skrip_v4_te = 'data/Skripal/v4/indv_network/actor_te_edges_2018_03_01_2018_05_01.csv'
@@ -91,22 +91,31 @@ for te_thresh in te_threshes:
     print(infl_df)
 
 cols = ['infl_type', \
-        'longest_path_len_0.025', \
         'longest_path_len_0.05', \
-        'longest_path_len_0.075',   \
         'longest_path_len_0.1', \
-        'av_path_len_0.025', \
+        'longest_path_len_0.15',   \
+        'longest_path_len_0.2', \
+        'longest_path_len_0.25', \
+        'longest_path_len_0.3', \
         'av_path_len_0.05', \
-        'av_path_len_0.075', \
         'av_path_len_0.1', \
-        'strongest_path_weight_0.025', \
+        'av_path_len_0.15', \
+        'av_path_len_0.2', \
+        'av_path_len_0.25', \
+        'av_path_len_0.3', \
         'strongest_path_weight_0.05', \
-        'strongest_path_weight_0.075', \
         'strongest_path_weight_0.1', \
-        'av_path_weight_0.025', \
+        'strongest_path_weight_0.15', \
+        'strongest_path_weight_0.2', \
+        'strongest_path_weight_0.25', \
+        'strongest_path_weight_0.3', \
         'av_path_weight_0.05', \
-        'av_path_weight_0.075', \
-        'av_path_weight_0.1']
+        'av_path_weight_0.1', \
+        'av_path_weight_0.15', \
+        'av_path_weight_0.2', \
+        'av_path_weight_0.25', \
+        'av_path_weight_0.3'
+        ]
 
 infl_df = infl_df[cols]
-infl_df.to_csv('pathway_analysis_Ukraine.csv', index=False)
+infl_df.to_csv(f'pathway_analysis_{dataset}_noderank_{node_rank}.csv', index=False)
