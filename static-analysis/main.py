@@ -10,12 +10,14 @@ from src import influential_edge_ranking
 from src import generate_edge_types
 from src import generate_trees
 
+#from src import temp # my addition
+
       
 # Use in interface
 
-pathway_selection="greedy" # options: summed, greedy, or None
-edge_type = 'UM_TM'
-te_thresh = 0.1
+pathway_selection="summed"#"greedy" # options: summed, greedy, or None
+edge_type = 'TM_TM'#'UM_TM'
+te_thresh = 0.25 #0.1
 
 cascade_df = pd.read_csv('data/Ukraine/Actor_TE_Edges_Ukraine_v1.csv', usecols=['Source', 'Target', edge_type])
 actor_df = pd.read_csv('data/Ukraine/actors_Ukraine_v1.csv')
@@ -29,9 +31,7 @@ nx.relabel_nodes(g, actors, copy=False)
 
 # Can replace 'influential_node_ranking with a single root node as a list
 # for example, root_nodes = ['Ian56789']
-root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=5, node_names=True)
+#root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=5, node_names=True)
+root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=1, node_names=True)
 
 generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
- 
-
-

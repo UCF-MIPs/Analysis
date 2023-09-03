@@ -1,4 +1,4 @@
-def strongest_path_greedy(tree,graph,root):
+def strongest_path_greedy(tree,graph,root): # derived from modification of Alex Baekey's strongest_path_greedy method
     '''
     returns a list of edges to color
     path selected by next strongest edge
@@ -9,7 +9,9 @@ def strongest_path_greedy(tree,graph,root):
     edges_from_source = tree.out_edges(root)
     out_edges = {}
     for i in edges_from_source:
-        n = list(graph.get_edge_data(*i).values())
+        # in case this is an aliased edge added during tree construction, dealias the edge so it will refer to the corresponding edge in graph; if the edge is not aliased, this will change nothing
+        i_dealiased = (i[0].rstrip(), i[1].rstrip())
+        n = list(graph.get_edge_data(*i_dealiased).values())
         out_edges[i]=n
     max_val = max(out_edges.values())
     selection = (k for k, v in out_edges.items() if v == max_val)
@@ -24,7 +26,9 @@ def strongest_path_greedy(tree,graph,root):
             break
         out_edges= {}
         for i in edges_from_in:
-            n = list(graph.get_edge_data(*i).values())
+            # in case this is an aliased edge added during tree construction, dealias the edge so it will refer to the corresponding edge in graph; if the edge is not aliased, this will change nothing
+            i_dealiased = (i[0].rstrip(), i[1].rstrip())
+            n = list(graph.get_edge_data(*i_dealiased).values())
             out_edges[i]=n
         max_val = max(out_edges.values())
         total_strength += max_val[0]
