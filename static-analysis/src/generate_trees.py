@@ -111,7 +111,6 @@ def make_edge_colormaps(xtrees, xpaths):
 
 def make_edge_colormap(t, p): # derived from modification of Alex Baekey's htrees method
 	colormap_edges = []
-	print(p)
 	for edge in t.edges:
 		if(edge in p):
 			colormap_edges.append('red')
