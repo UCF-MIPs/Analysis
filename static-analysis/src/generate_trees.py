@@ -111,6 +111,7 @@ def make_edge_colormaps(xtrees, xpaths):
 
 def make_edge_colormap(t, p): # derived from modification of Alex Baekey's htrees method
 	colormap_edges = []
+	print(p)
 	for edge in t.edges:
 		if(edge in p):
 			colormap_edges.append('red')
@@ -177,14 +178,17 @@ def make_node_label(t):
 
 def make_figs(rnodes, xtrees, xcolormap_nodes, xpathways, xstrengths, xcolormap_edges, xpos, xlabel_nodes, edge_type, te_thresh, dir_name): # derived from modification of Alex Baekey's htrees method
 	for i in range(len(rnodes)):
+		plt.figure(num=i)
 		plt.axis("off")
 		nx.draw_networkx_nodes(xtrees[i], xpos[i], node_color=xcolormap_nodes[i], node_size=50)
 		nx.draw_networkx_edges(xtrees[i], xpos[i], edge_color=xcolormap_edges[i])
 		nx.draw_networkx_labels(xtrees[i], xpos[i],labels=xlabel_nodes[i], font_size=8, verticalalignment='top')
 
 		if dir_name is not None:
-			plt.savefig(f'{dir_name}/{edge_type}_te_thresh{te_thresh}_root{rnodes[i]}.png', bbox_inches='tight')
+			plt.savefig(f'{dir_name}/{edge_type}_te_thresh{te_thresh}_root{rnodes[i]}.png')#, bbox_inches='tight')
 		else: 
 			plt.savefig(f'{edge_type}_te_thresh{te_thresh}_root{rnodes[i]}.png', bbox_inches='tight')
+
+		plt.close(fig=i)
 
 		#plt.show()

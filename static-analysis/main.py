@@ -17,7 +17,7 @@ from src import generate_trees
 
 pathway_selection="summed"#"greedy" # options: summed, greedy, or None
 edge_type = 'TM_TM'#'UM_TM'
-te_thresh = 0.25 #0.1
+te_thresh = 0.35 #0.1
 
 cascade_df = pd.read_csv('data/Ukraine/Actor_TE_Edges_Ukraine_v1.csv', usecols=['Source', 'Target', edge_type])
 actor_df = pd.read_csv('data/Ukraine/actors_Ukraine_v1.csv')

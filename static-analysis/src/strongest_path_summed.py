@@ -26,15 +26,18 @@ def strongest_path_summed(tree, graph, root): # derived from modification of Ale
     # traverse each previously identified path, and find the total of all edge weights for each path
     total = 0
     total_temp=0
-    for path in pathways:
-        for edge in path:
-            # in case this is an aliased edge added during tree construction, dealias the edge so it will refer to the corresponding edge in graph; if the edge is not aliased, this will change nothing
-            edge_dealiased = (edge[0].rstrip(), edge[1].rstrip())
-            total_temp += float(list(graph.get_edge_data(*edge_dealiased).values())[0])
-        if total_temp > total:
-            total = total_temp
-            strongest_pathway = path
-        total_temp=0
+    if pathways:
+        for path in pathways:
+            for edge in path:
+                # in case this is an aliased edge added during tree construction, dealias the edge so it will refer to the corresponding edge in graph; if the edge is not aliased, this will change nothing
+                edge_dealiased = (edge[0].rstrip(), edge[1].rstrip())
+                total_temp += float(list(graph.get_edge_data(*edge_dealiased).values())[0])
+            if total_temp > total:
+                total = total_temp
+                strongest_pathway = path
+            total_temp=0
+    else:
+        return [], 0.0
     return strongest_pathway, total
 
 
