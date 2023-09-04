@@ -31,7 +31,6 @@ nx.relabel_nodes(g, actors, copy=False)
 
 # Can replace 'influential_node_ranking with a single root node as a list
 # for example, root_nodes = ['Ian56789']
-#root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=5, node_names=True)
-root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=1, node_names=True)
+root_nodes = influential_node_ranking.influential_node_ranking(g, pulltop=5, node_names=True)
 
 generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=None)
