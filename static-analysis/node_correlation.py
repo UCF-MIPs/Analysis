@@ -138,9 +138,18 @@ top_infl_presence_df = node_presence_df[mask]
 mask = infl_weights_df['actors'].isin(top_infl)
 top_infl_weights_df = infl_weights_df[mask]
 
-# all node data in node_presence_df and infl_weights_df
+
+node_ranks_df = pd.DataFrame.from_dict(influencer_dict)
+
+# all node data in node_presence_df and infl_weights_df, ranking in node_ranks_df
 # top influential node data in top_infl_presence_df and top_infl_weights_df
 
 print(top_infl_presence_df)
 print(top_infl_weights_df)
+print(node_ranks_df)
+
+top_infl_presence_df.to_csv('top_infl_presence_df.csv')
+top_infl_weights_df.to_csv('top_infl_weights_df.csv')
+node_ranks_df.to_csv('node_ranks_df.csv')
+
 
