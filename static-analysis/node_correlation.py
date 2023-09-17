@@ -65,6 +65,11 @@ node_presence_df = pd.DataFrame(columns = edge_types2)
 node_presence_df['actors'] = actors
 node_presence_df.fillna(value=0, inplace=True)
 
+infl_weights_df = pd.DataFrame(columns = edge_types2)
+infl_weights_df['actors'] = actors
+infl_weights_df.fillna(value=0, inplace=True)
+
+
 # Save node influence ranking for each type (top ~20)
 influencer_dict = {}
 
@@ -86,20 +91,28 @@ for edge_type in edge_types:
 
     graph_dict[edge_type] = g
 
-
-    # FIX UP
+    # identify which influence types nodes appear in
     for node in actors.values():
-        #print(node)
+        ## presence df filling
         if g.has_node(node):
-            #doesn't work
             row_index = node_presence_df.index[node_presence_df['actors']==node].to_list()
-            print(row_index)
             node_presence_df.loc[row_index, [edge_type]] = 1
 
-    ### IMPORTANT NODE RANK ###
+        ## weight df filling
+        if g.has_node(node):
+            out_edges = g.out_edges(node, data=True)
+            summed_weight = 0
+            for edge_data in out_edges:
+                #convert 'dict_items' dtype to float
+                for k, v in edge_data[2].items():
+                    w = float(v)
+                summed_weight += w
+            row_index = infl_weights_df.index[infl_weights_df['actors']==node].to_list()
+            infl_weights_df.loc[row_index, [edge_type]]=summed_weight
+ 
 
-    # Can replace 'influential_node_ranking with a single root node as a list
-    # for example, root_nodes = ['Ian56789'] 
+    ### NODE RANK ###
+
     if node_rank == 'outdegree':
         root_nodes = influential_node_ranking.influential_node_ranking_outdegree(g, pulltop=20, node_names=False)
     if node_rank == 'bc':
@@ -110,23 +123,24 @@ for edge_type in edge_types:
     influencer_dict[edge_type] = root_nodes 
 
 
+influencers = list(influencer_dict.values())
+top_infl = []
 
-#print(influencer_dict)
-print(node_presence_df)
-print(influencer_dict)
+for edge_t in influencers:
+    for act in edge_t:
+        top_infl.append(act[0])
 
-'''
-### TREES ###
+top_infl = list(set(top_infl))
 
-#generate_trees.generate_tree_plots(g, edge_type, te_thresh, pathway_selection, root_nodes, dir_name=dir_name)
-#rnodes, xtrees, xpathways, xstrengths, xcolormap_nodes, xcolormap_edges, xpos = generate_trees.generate_tree_data(g, edge_type, te_thresh, pathway_selection, root_nodes)
+mask = node_presence_df['actors'].isin(top_infl)
+top_infl_presence_df = node_presence_df[mask]
 
-with open(f'graph_dict_{dataset}.pkl', 'wb') as fp:
-    pickle.dump(graph_dict, fp)
-    print('dictionary saved successfully to file')
+mask = infl_weights_df['actors'].isin(top_infl)
+top_infl_weights_df = infl_weights_df[mask]
 
-metric_dict = graph_dict2metric_dict.graph_dict2metric_dict(graph_dict, metric_selection='outdegree')
-plot_quadrant.plot_quadrant(metric_dict, f'{dataset}')
-'''
+# all node data in node_presence_df and infl_weights_df
+# top influential node data in top_infl_presence_df and top_infl_weights_df
 
+print(top_infl_presence_df)
+print(top_infl_weights_df)
 
