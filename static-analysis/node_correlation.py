@@ -153,3 +153,45 @@ top_infl_weights_df.to_csv('top_infl_weights_df.csv')
 node_ranks_df.to_csv('node_ranks_df.csv')
 
 
+
+infl_type_corr = {}
+
+edge_types3 = edge_types + ['edge_types']
+infl_type_corr_df = pd.DataFrame(columns = edge_types)
+infl_type_corr_df['edge_types'] = edge_types
+infl_type_corr_df.fillna(value=0, inplace=True)
+
+
+# Node activity comparison
+for edge_type_i in edge_types:
+    for edge_type_j in edge_types:
+        summed_activity_score = 0
+        for actor in actors:
+            if edge_type_i != edge_type_j:
+                row_index_i = infl_weights_df.index[infl_weights_df['actors']==actor].to_list()
+                # Future warning from pandas on using float() on a .loc
+                a1 = float(infl_weights_df.loc[row_index, edge_type_i])
+                a2 = float(infl_weights_df.loc[row_index, edge_type_j])
+                activity_diff = np.abs(a1 - a2)
+                if(activity_diff == 0 and a1 ==0 and a2 == 0):
+                    pass
+                else:
+                    summed_activity_score += 1/activity_diff
+            
+        infl_type_corr[str(edge_type_i + '__' + edge_type_j)] = summed_activity_score
+        
+
+        row_ind = infl_type_corr_df.index[infl_type_corr_df['edge_types']==edge_type_i].to_list()
+        infl_type_corr_df.loc[row_ind, [edge_type_j]] = summed_activity_score
+
+print(infl_type_corr)
+print(infl_type_corr_df)
+
+
+
+
+
+
+
+
+
