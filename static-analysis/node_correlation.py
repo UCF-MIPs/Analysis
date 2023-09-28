@@ -15,8 +15,12 @@ pd.set_option('display.max_columns', None)
 
 edge_types = generate_edge_types.generate_edge_types()
 edge_types = edge_types + ['T_T', 'U_U', 'U_T', 'T_U', 'TM_*', 'TF_*', 'UM_*', 'UF_*', '*_TM', '*_TF', '*_UM', '*_UF']
-node_rank = 'outdegree'
-dataset = 'skrip_v7' # options: skrip_v4, skrip_v7, ukr_v3
+dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
+
+if dataset=='ukr_v3':
+    # rename total_te to *_*
+    dict1 = {"total_te":"*_*"}
+    edge_types = [dict1.get(n,n) for n in edge_types]
 
 # Data
 skrip_v7_te = 'data/Skripal/v7/indv_network/actor_te_edges_df.csv'
@@ -88,6 +92,6 @@ for edge_type in edge_types:
             in_infl_weights_df.loc[row_index, [edge_type]]=summed_weight
  
 
-out_infl_weights_df.to_csv('out_infl_weights_df.csv')
-in_infl_weights_df.to_csv('in_infl_weights_df.csv')
+out_infl_weights_df.to_csv(f'{dataset}_out_infl_weights_df.csv')
+in_infl_weights_df.to_csv(f'{dataset}_in_infl_weights_df.csv')
 

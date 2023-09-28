@@ -9,13 +9,18 @@ pd.set_option('display.max_rows', None)
 #pd.set_option('display.max_columns', None)
 
 edge_types = ['TM_*', 'TF_*', 'UM_*', 'UF_*']
-dataset = 'skrip_v7' # options: skrip_v4, skrip_v7, ukr_v3
+dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
 
-in_infl_weights_df = pd.read_csv("in_infl_weights_df.csv")
+in_infl_weights_df = pd.read_csv(f'{dataset}_in_infl_weights_df.csv')
+out_infl_weights_df = pd.read_csv(f'{dataset}_out_infl_weights_df.csv')
+
+
+
+### COMPARING ALL AGGREGATES
+
 #in_aggr_infl_weights_df = in_infl_weights_df[['actors', 'UM_*', 'UF_*', 'TM_*', 'TF_*']]
 in_aggr_infl_weights_df = in_infl_weights_df[['UM_*', 'UF_*', 'TM_*', 'TF_*']]
 
-out_infl_weights_df = pd.read_csv("out_infl_weights_df.csv")
 #out_aggr_infl_weights_df = out_infl_weights_df[['actors', 'UM_*', 'UF_*', 'TM_*', 'TF_*']]
 out_aggr_infl_weights_df = out_infl_weights_df[['UM_*', 'UF_*', 'TM_*', 'TF_*']]
 
@@ -25,7 +30,6 @@ out_aggr_infl_weights_df = out_infl_weights_df[['UM_*', 'UF_*', 'TM_*', 'TF_*']]
 
 # sort by value of first column
 out_aggr_infl_weights_df = out_aggr_infl_weights_df.sort_values(by=['UM_*'], ascending=False)
-
 in_aggr_infl_weights_df = in_aggr_infl_weights_df.sort_values(by=['UM_*'], ascending=False)
 
 #inout_df = in_aggr_infl_weights_df['actors']
@@ -33,9 +37,8 @@ in_aggr_infl_weights_df = in_aggr_infl_weights_df.sort_values(by=['UM_*'], ascen
 #print(inout_df)
 #outin_df = in_infl_weights_df[edge_types].reindex(out_aggr_infl_weights_df.index)
 
-
 # incoming edges plot
-heatmap = np.empty((4, 2001))
+heatmap = np.empty((4, len(in_aggr_infl_weights_df['UM_*'])))
 
 for i, (column_name, column_data) in enumerate(in_aggr_infl_weights_df.items()):
     if(column_name!='actors'):
@@ -48,14 +51,14 @@ im = ax.imshow(heatmap, interpolation='nearest', vmax=23)
 ax.set_yticks(range(4))
 ax.set_yticklabels(['UM_*', 'UF_*', 'TM_*', 'TF_*'])
 ax.set_xlabel('actors')
-ax.set_title('target actor incoming activity')
+ax.set_title(f'{dataset} target actor incoming activity')
 
 # colorbar
 cbar = fig.colorbar(ax=ax, mappable=im, orientation = 'horizontal')
 cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
-plt.savefig('in_node_activity.png')
+plt.savefig(f'{dataset}_aggr_in_node_activity.png')
 
 '''
 # corresponding order for out
@@ -85,7 +88,7 @@ plt.savefig('in2out_node_activity.png')
 '''
 
 # outgoing edges plot
-heatmap = np.empty((4, 2001))
+heatmap = np.empty((4, len(out_aggr_infl_weights_df['UM_*'])))
 
 for i, (column_name, column_data) in enumerate(out_aggr_infl_weights_df.items()):
     if(column_name!='actors'):
@@ -97,14 +100,14 @@ im = ax.imshow(heatmap, interpolation='nearest', vmax=23)
 ax.set_yticks(range(4))
 ax.set_yticklabels(['UM_*', 'UF_*', 'TM_*', 'TF_*'])
 ax.set_xlabel('actors')
-ax.set_title('source actor outgoing activity')
+ax.set_title('{dataset} source actor outgoing activity')
 
 # colorbar
 cbar = fig.colorbar(ax=ax, mappable=im, orientation = 'horizontal')
 cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
-plt.savefig('out_node_activity.png')
+plt.savefig(f'{dataset}_aggr_out_node_activity.png')
 
 '''
 # corresponding order for in 
@@ -159,14 +162,14 @@ im = ax.imshow(heatmap, interpolation='nearest', vmax=23)
 ax.set_yticks(range(5))
 ax.set_yticklabels(['UM_*', 'UM_UM', 'UM_UF', 'UM_TM', 'UM_TF'])
 ax.set_xlabel('rank of actors')
-ax.set_title('UM source actor outgoing activity')
+ax.set_title(f'{dataset} UM source actor outgoing activity')
 
 # colorbar
 cbar = fig.colorbar(ax=ax, mappable=im, orientation = 'horizontal')
 cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
-plt.savefig('UM_out_node_activity.png')
+plt.savefig(f'{dataset}_UM_out_node_activity.png')
 
 
 
@@ -194,14 +197,14 @@ im = ax.imshow(heatmap, interpolation='nearest', vmax=23)
 ax.set_yticks(range(5))
 ax.set_yticklabels(['TM_*', 'TM_TM', 'TM_TF', 'TM_UM', 'TM_UF'])
 ax.set_xlabel('rank of actors')
-ax.set_title('TM source actor outgoing activity')
+ax.set_title(f'{dataset} TM source actor outgoing activity')
 
 # colorbar
 cbar = fig.colorbar(ax=ax, mappable=im, orientation = 'horizontal')
 cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
-plt.savefig('TM_out_node_activity.png')
+plt.savefig(f'{dataset}_TM_out_node_activity.png')
 
 
 
@@ -230,14 +233,14 @@ im = ax.imshow(heatmap, interpolation='nearest', vmax=23)
 ax.set_yticks(range(5))
 ax.set_yticklabels(['UF_*', 'UF_UF', 'UF_UM', 'UF_TM', 'UF_TF'])
 ax.set_xlabel('rank of actors')
-ax.set_title('UF source actor outgoing activity')
+ax.set_title(f'{dataset} UF source actor outgoing activity')
 
 # colorbar
 cbar = fig.colorbar(ax=ax, mappable=im, orientation = 'horizontal')
 cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
-plt.savefig('UF_out_node_activity.png')
+plt.savefig(f'{dataset}_UF_out_node_activity.png')
 
 
 
@@ -266,14 +269,14 @@ im = ax.imshow(heatmap, interpolation='nearest', vmax=23)
 ax.set_yticks(range(5))
 ax.set_yticklabels(['TF_*', 'TF_TF', 'TF_TM', 'TF_UM', 'TF_UF'])
 ax.set_xlabel('rank of actors')
-ax.set_title('TF source actor outgoing activity')
+ax.set_title(f'{dataset} TF source actor outgoing activity')
 
 # colorbar
 cbar = fig.colorbar(ax=ax, mappable=im, orientation = 'horizontal')
 cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
-plt.savefig('TF_out_node_activity.png')
+plt.savefig(f'{dataset}_TF_out_node_activity.png')
 
 
 
