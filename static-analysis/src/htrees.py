@@ -4,13 +4,86 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from collections import deque
 
 
-def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, path=None):
+
+def htree(graph, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, path=None):
     '''
     horizontal trees/hierarchical directed graph propogation
-    input:
+    
+        Parameters:
+        Returns:
     ...
     path: strongest pathway selection method: None, greedy, or summed (total edge weight)
     '''
+    tree_edges = list(graph.edges)
+    tree = bfs_tree_AB(G=graph, source=root, visited_lim=visited_lim, depth_lim = depth_lim, edges = tree_edges)
+    root_orig = root
+    colormap_nodes = []
+    for node in tree:
+        if(node in orig_nodes):
+            if graph.out_degree(node)==0:
+                colormap_nodes.append('green')
+            else:
+                colormap_nodes.append('#1f78b4')
+        elif(node not in orig_nodes):
+            colormap_nodes.append('yellow')
+    if path == None:
+        pass
+    elif path == 'greedy':
+        pathway, strength = strongest_path_greedy.strongest_path_greedy(tree,graph,root)
+    elif path == 'summed':
+        pathway, strength = strongest_path_summed.strongest_path_summed(tree,graph,root)
+    colormap_edges = []
+    for edge in tree.edges:
+        if(edge in pathway):
+            colormap_edges.append('red')
+        else:
+            colormap_edges.append('black')
+    pos = graphviz_layout(tree, prog='dot', args="-Grankdir=LR")
+
+    return tree, pathway, strength, colormap_nodes, colormap_edges, pos
+
+
+
+
+def htrees(graphs, edge_type, te_thresh, visited_lim, depth_lim, orig_nodes, path=None):
+    '''
+    horizontal trees/hierarchical directed graph propogation
+    
+        Parameters:
+
+            graphs (list): A list of networkx graphs, one per root node
+
+            edge_type (str): edge weight column name
+
+            te_thresh (float): minimum edge_weight threshold
+
+            visited_lim (int): Max number of visits to nodes. To be input into te_rollout
+
+            depth_lim (int): Max depth of the tree. To be input into te_rollout
+
+            orig_nodes (list): list of nodes from original network, 
+            used for duplicate node naming scheme
+
+        Returns:
+
+            rnodes (list): list of root nodes
+
+            xtrees ()
+
+            xpathways () 
+
+            xstrengths ()
+
+            xcolormap_n ()
+
+            xcolormap_e ()
+
+            xpos ()
+
+    ...
+    path: strongest pathway selection method: None, greedy, or summed (total edge weight)
+    '''
+    #TODO finish docstring
     rnodes = []
     xtrees = []
     xpathways = []

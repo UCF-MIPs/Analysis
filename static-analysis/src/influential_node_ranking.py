@@ -1,7 +1,7 @@
 import networkx as nx
 
 
-def influential_node_ranking(g, pulltop=0, node_names=False):
+def influential_node_ranking_bc(g, pulltop=0, node_names=False):
     '''
     ranking nodes in a network based on betweenness-centrality
     node_names: bool to indicate whether or not to return just node names:
@@ -16,4 +16,23 @@ def influential_node_ranking(g, pulltop=0, node_names=False):
         for n, i in enumerate(sorted_nodes):
             sorted_nodes[n] = i[0]
     return sorted_nodes
+
+def influential_node_ranking_outdegree(g, pulltop=0, node_names=False):
+    '''
+    ranking nodes in a network based on betweenness-centrality
+    node_names: bool to indicate whether or not to return just node names:
+        True - just return top node names
+        False - return node names and betweenness centrality as tuple
+    '''
+    outdegree_nodes = dict(g.out_degree())
+    sorted_nodes = sorted(outdegree_nodes.items(), key=lambda x:x[1], reverse=True)
+    if pulltop != 0:
+        sorted_nodes = sorted_nodes[:pulltop]
+    if node_names == True:
+        for n, i in enumerate(sorted_nodes):
+            sorted_nodes[n] = i[0]
+    return sorted_nodes
+
+
+
 

@@ -9,10 +9,29 @@ import matplotlib.lines as mlin
 def plot_htrees(xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos, te_thresh, edge_type):
     '''
     horizontal trees/hierarchical directed graph propogation
-    input:
-    ...
-    path: strongest pathway selection method: None, greedy, or summed (total edge weight)
+    
+        Parameters:
+            
+            xtrees
+
+            xpathways
+
+            xcolormap_nodes
+
+            xcolormap_edges
+
+            xpos
+
+            te_thresh
+
+            edge_type
+
+        Returns:
+
+            figs
+    
     '''
+    #TODO finish docstring
     figs = []
     for tree, pathway, colormap_nodes, colormap_edges, pos in zip (xtrees, xpathways, xcolormap_nodes, xcolormap_edges, xpos):
         fig, ax = plt.subplots(figsize=(6,11))
