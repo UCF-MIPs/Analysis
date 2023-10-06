@@ -5,9 +5,11 @@ static-analysis/results/*
 static-analysis/old_results/*
 static-analysis/src/__pycache__
 static-analysis/__pycache__
+static-analysis/*.swp
 static-analysis/Ukraine_trees/*
 static-analysis/path_metrics.csv
 static-analysis/plots/*
+static-analysis/src/*.swp
 UFTM-classification/results/*
 UFTM-classification/data/*
 UFTM-classification/resources/*
