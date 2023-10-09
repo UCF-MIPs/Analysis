@@ -15,7 +15,7 @@ pd.set_option('display.max_columns', None)
 
 edge_types = generate_edge_types.generate_edge_types()
 edge_types = edge_types + ['T_T', 'U_U', 'U_T', 'T_U', 'TM_*', 'TF_*', 'UM_*', 'UF_*', '*_TM', '*_TF', '*_UM', '*_UF']
-dataset = 'skrip_v7' # options: skrip_v4, skrip_v7, ukr_v3
+dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
 
 if dataset=='ukr_v3':
     # rename total_te to *_*
@@ -53,8 +53,6 @@ in_infl_weights_df.fillna(value=0, inplace=True)
 # Pre-process #TODO fix to include chunking method
 graph_df = pd.read_csv(te_df_path)
 graph_df = add_aggregate_networks.add_aggr_nets(graph_df)
- 
-influencer_dict = {}
 
 for edge_type in edge_types:
     graph_dict[edge_type] = {}

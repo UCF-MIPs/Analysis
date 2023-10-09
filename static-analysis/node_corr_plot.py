@@ -1,10 +1,17 @@
+#TODO
+# move generated dfs from node_correlation to results folder
+# Get participation coeff working
+# get ukr/skrip working simultaneously in node_correlation
+# put plotting functions into loops
+# put participation coeff calculations in loops
+# move part coeff function to src
+
 import networkx as nx
 import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-plt.ion()
 
 pd.set_option('display.max_rows', None)
 #pd.set_option('display.max_columns', None)
@@ -370,5 +377,51 @@ cbar.set_label('Transfer Entropy')
 
 ax.set_aspect('auto')
 plt.savefig(f'{dataset}_TF_in_node_activity.png')
+
+
+
+# participation coefficient
+
+def part_coeff(df, sour_infl):
+    # probably should include actors and go row by row
+    m=4
+    types = ['UF', 'UM', 'TF', 'TM']
+    aggr_type = str(sour_infl + '_*')
+    o = df[aggr_type].to_numpy()
+    ptemp = np.zeros_like(o)
+    for i in types:
+        infl_type = str(sour_infl + '_' + i)
+        #print(infl_type)
+        #print(k.shape)
+        #print(np.count_nonzero(k))
+        k = df[infl_type].to_numpy()
+        #print(np.count_nonzero(o))
+        ptemp += np.divide(k,o,out=np.zeros_like(k), where=o!=0, dtype=float)**2
+    p = (4./3.)*ptemp
+    return p # array of part. coeffs
+
+
+part_cof_UM = part_coeff(out_infl_weights_df, 'UM')
+part_cof_TM = part_coeff(out_infl_weights_df, 'TM')
+part_cof_UF = part_coeff(out_infl_weights_df, 'UF')
+part_cof_TF = part_coeff(out_infl_weights_df, 'TF')
+
+
+part_df = pd.DataFrame({'actors': out_infl_weights_df['actors'],\
+                        'p_UM': part_cof_UM,\
+                        'p_TM': part_cof_TM,\
+                        'p_UF': part_cof_UF,\
+                        'p_TF': part_cof_TF})
+
+
+part_df.to_csv(f'{dataset}_part_coef.csv')
+
+
+
+
+
+
+
+
 
 
