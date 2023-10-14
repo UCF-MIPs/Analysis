@@ -2,14 +2,14 @@ import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
-from src import auto_threshold
-from src import te_rollout
-from src import htrees
-from src import plot_htrees
-from src import influential_node_ranking
-from src import influential_edge_ranking
-from src import generate_edge_types
-from src import generate_trees
+from .src import auto_threshold
+from .src import te_rollout
+from .src import htrees
+from .src import plot_htrees
+from .src import influential_node_ranking
+from .src import influential_edge_ranking
+from .src import generate_edge_types
+from .src import generate_trees
       
 # Use in interface
 pathway_selection="greedy" # options: summed, greedy, or None
