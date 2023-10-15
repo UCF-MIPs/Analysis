@@ -15,11 +15,7 @@ pd.set_option('display.max_columns', None)
 
 edge_types = generate_edge_types.generate_edge_types()
 edge_types = edge_types + ['T_T', 'U_U', 'U_T', 'T_U', 'TM_*', 'TF_*', 'UM_*', 'UF_*', '*_TM', '*_TF', '*_UM', '*_UF']
-<<<<<<< HEAD
 dataset = 'ukr_v3' # options: skrip_v4, skrip_v7, ukr_v3
-=======
-dataset = 'skrip_v7' # options: skrip_v4, skrip_v7, ukr_v3
->>>>>>> dev-ab
 
 if dataset=='ukr_v3':
     # rename total_te to *_*
@@ -27,10 +23,10 @@ if dataset=='ukr_v3':
     edge_types = [dict1.get(n,n) for n in edge_types]
 
 # Data
-skrip_v7_te = 'data/Skripal/v7/indv_network/actor_te_edges_df.csv'
-skrip_v7_act = 'data/Skripal/v7/indv_network/actors_df.csv'
-ukr_v3_te = 'data/Ukraine/v3/dynamic/actor_te_edges_df_2022_01_01_2022_05_01.csv'
-ukr_v3_act = 'data/Ukraine/v3/dynamic/actors_df.csv'
+skrip_v7_te = '/Users/sinaabdi/Data/actor_te_edges_df - Skripal.csv'
+skrip_v7_act = '/Users/sinaabdi/Data/actors_df - Skripal.csv'
+ukr_v3_te = '/Users/sinaabdi/Data/actor_te_edges_df_2022_01_01_2022_05_01 - Ukraine.csv'
+ukr_v3_act = '/Users/sinaabdi/Data/actors_df - Ukraine.csv'
 
 te_df_name = f'{dataset}_te'
 act_df_name = f'{dataset}_act'
