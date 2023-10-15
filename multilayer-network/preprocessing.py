@@ -1,20 +1,17 @@
 import networkx as nx
 import pandas as pd
 import numpy as np
-import os
 from pathlib import Path
 from src import generate_edge_types
-#from src import influential_node_ranking
-#from src import influential_edge_ranking
 from src import add_aggregate_networks
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
 edge_types = generate_edge_types.generate_edge_types()
-edge_types = edge_types + ['T_T', 'U_U', 'U_T', 'T_U', 'TM_*', 'TF_*', 'UM_*', 'UF_*', '*_TM', '*_TF', '*_UM', '*_UF']
+edge_types = edge_types + ['TM_*', 'TF_*', 'UM_*', 'UF_*', '*_TM', '*_TF', '*_UM', '*_UF']
 
-dataset = 'skrip_v7' # options: skrip_v4, skrip_v7, ukr_v3
+dataset = 'skrip_v7' # options: skrip_v7, ukr_v3
 
 # TODO fix? not sure if *_* == total_te
 if dataset=='ukr_v3':
@@ -23,10 +20,10 @@ if dataset=='ukr_v3':
     edge_types = [dict1.get(n,n) for n in edge_types]
 
 # Data
-skrip_v7_te = 'data/Skripal/v7/indv_network/actor_te_edges_df.csv'
-skrip_v7_act = 'data/Skripal/v7/indv_network/actors_df.csv'
-ukr_v3_te = 'data/Ukraine/v3/dynamic/actor_te_edges_df_2022_01_01_2022_05_01.csv'
-ukr_v3_act = 'data/Ukraine/v3/dynamic/indv_actors_df.csv'
+skrip_v7_te = 'multilayer-network/Data/actor_te_edges_df - Skripal.csv'
+skrip_v7_act = 'multilayer-network/Data/actors_df - Skripal.csv'
+ukr_v3_te = 'Data/actor_te_edges_df_2022_01_01_2022_05_01 - Ukraine.csv'
+ukr_v3_act = 'Data/actors_df - Ukraine.csv'
 
 te_df_name = f'{dataset}_te'
 act_df_name = f'{dataset}_act'
@@ -117,6 +114,7 @@ for edge_type in edge_types:
                 summed_weight += w
             row_index = in_infl_weights_df.index[in_infl_weights_df['actors']==node].to_list()
             in_infl_weights_df.loc[row_index, [edge_type]]=summed_weight
-out_infl_weights_df.to_csv(f'data/preprocessed/{dataset}_out_infl_weights_df.csv')
-in_infl_weights_df.to_csv(f'data/preprocessed/{dataset}_in_infl_weights_df.csv')
+
+out_infl_weights_df.to_csv(f'multilayer-network/Data/preprocessed/{dataset}_out_infl_weights_df.csv')
+in_infl_weights_df.to_csv(f'multilayer-network/Data/preprocessed/{dataset}_in_infl_weights_df.csv')
 

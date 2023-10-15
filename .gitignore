@@ -14,3 +14,6 @@ UFTM-classification/results/*
 UFTM-classification/data/*
 UFTM-classification/resources/*
 UFTM-classification/__pycache__
+multilayer-network/Data/*
+multilayer-network/src/__pycache__
+multilayer-network/plots/*

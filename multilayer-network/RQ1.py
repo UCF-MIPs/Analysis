@@ -7,10 +7,8 @@
 # move part coeff function to src
 # isolate code for paper from the influence trees stuff
 
-import networkx as nx
 import pandas as pd
 import numpy as np
-import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from src import plot_heatmap
@@ -18,76 +16,78 @@ from src import plot_heatmap
 pd.set_option('display.max_rows', None)
 #pd.set_option('display.max_columns', None)
 
-edge_types = ['TM_*', 'TF_*', 'UM_*', 'UF_*']
-dataset = 'ukr_v3' # options: skrip_v7, ukr_v3
+edge_types = ['TM_*', 'TF_*', 'UM_*', 'UF_*', '*_TM', '*_TF', '*_UM', '*_UF']
+dataset = 'skrip_v7' # options: skrip_v7, ukr_v3
 
 if(dataset=='ukr_v3'):
     name = 'Ukraine'
 elif(dataset=='skrip_v7'):
     name = 'Skripal'
 
-results_dir = 'results'
+results_dir = 'multilayer-network/plots'
 
-in_infl_wdf = pd.read_csv(f'data/preprocessed/{dataset}_in_infl_weights_df.csv')
-out_infl_wdf = pd.read_csv(f'data/preprocessed/{dataset}_out_infl_weights_df.csv')
-
-
+in_infl_wdf = pd.read_csv(f'multilayer-network/Data/preprocessed/{dataset}_in_infl_weights_df.csv')
+out_infl_wdf = pd.read_csv(f'multilayer-network/Data/preprocessed/{dataset}_out_infl_weights_df.csv')
 
 ######## Heatmaps for each influence type #########
 
 ######## UM #########
-UM_in_aggr_wdf = in_infl_wdf[['actors', 'UM_*', 'UM_UM', 'UM_UF', 'UM_TM', 'UM_TF']]
+## Sources/ Outgoing ##
 UM_out_aggr_wdf = out_infl_wdf[['actors', 'UM_*', 'UM_UM', 'UM_UF', 'UM_TM', 'UM_TF']]
-UM_in_aggr_wdf = UM_in_aggr_wdf.loc[UM_in_aggr_wdf['UM_*'] !=0]
 UM_out_aggr_wdf = UM_out_aggr_wdf.loc[UM_out_aggr_wdf['UM_*'] !=0]
-
 UM_out_aggr_wdf = UM_out_aggr_wdf.sort_values(by=['UM_*'], ascending=False).dropna()
-UM_in_aggr_wdf = UM_in_aggr_wdf.sort_values(by=['UM_*'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_outdegree('UM', UM_out_aggr_wdf, name, results_dir)
 
-plot_heatmap.plot_heatmap('UM', UM_out_aggr_wdf, name, results_dir, outgoing=True)
-plot_heatmap.plot_heatmap('UM', UM_in_aggr_wdf, name, results_dir, outgoing=False)
+## Targets/ Incoming ##
+UM_in_aggr_wdf = in_infl_wdf[['actors', '*_UM', 'UM_UM', 'TM_UM', 'UF_UM', 'TF_UM']]
+UM_in_aggr_wdf = UM_in_aggr_wdf.loc[UM_in_aggr_wdf['*_UM'] !=0]
+UM_in_aggr_wdf = UM_in_aggr_wdf.sort_values(by=['*_UM'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_indegree('UM', UM_in_aggr_wdf, name, results_dir)
 
 
 
 ######## TM #########
-TM_in_aggr_wdf = in_infl_wdf[['actors', 'TM_*', 'TM_UM', 'TM_UF', 'TM_TM', 'TM_TF']]
-TM_out_aggr_wdf = out_infl_wdf[['actors', 'TM_*', 'TM_UM', 'TM_UF', 'TM_TM', 'TM_TF']]
-TM_in_aggr_wdf = TM_in_aggr_wdf.loc[TM_in_aggr_wdf['TM_*'] !=0]
+## Sources/ Outgoing ##
+TM_out_aggr_wdf = out_infl_wdf[['actors', 'TM_*', 'TM_TM', 'TM_UM', 'TM_TF', 'TM_UF']]
 TM_out_aggr_wdf = TM_out_aggr_wdf.loc[TM_out_aggr_wdf['TM_*'] !=0]
-
 TM_out_aggr_wdf = TM_out_aggr_wdf.sort_values(by=['TM_*'], ascending=False).dropna()
-TM_in_aggr_wdf = TM_in_aggr_wdf.sort_values(by=['TM_*'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_outdegree('TM', TM_out_aggr_wdf, name, results_dir)
 
-plot_heatmap.plot_heatmap('TM', TM_out_aggr_wdf, name, results_dir, outgoing=True)
-plot_heatmap.plot_heatmap('TM', TM_in_aggr_wdf, name, results_dir, outgoing=False)
+## Targets/ Incoming ##
+TM_in_aggr_wdf = in_infl_wdf[['actors', '*_TM', 'TM_TM', 'UM_TM', 'TF_TM', 'UF_TM']]
+TM_in_aggr_wdf = TM_in_aggr_wdf.loc[TM_in_aggr_wdf['*_TM'] !=0]
+TM_in_aggr_wdf = TM_in_aggr_wdf.sort_values(by=['*_TM'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_indegree('TM', TM_in_aggr_wdf, name, results_dir)
 
 
 
 ######## UF #########
-UF_in_aggr_wdf = in_infl_wdf[['actors', 'UF_*', 'UF_UM', 'UF_UF', 'UF_TM', 'UF_TF']]
-UF_out_aggr_wdf = out_infl_wdf[['actors', 'UF_*', 'UF_UM', 'UF_UF', 'UF_TM', 'UF_TF']]
-UF_in_aggr_wdf = UF_in_aggr_wdf.loc[UF_in_aggr_wdf['UF_*'] !=0]
+## Sources/ Outgoing ##
+UF_out_aggr_wdf = out_infl_wdf[['actors', 'UF_*', 'UF_UF', 'UF_TF', 'UF_UM', 'UF_TM']]
 UF_out_aggr_wdf = UF_out_aggr_wdf.loc[UF_out_aggr_wdf['UF_*'] !=0]
-
 UF_out_aggr_wdf = UF_out_aggr_wdf.sort_values(by=['UF_*'], ascending=False).dropna()
-UF_in_aggr_wdf = UF_in_aggr_wdf.sort_values(by=['UF_*'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_outdegree('UF', UF_out_aggr_wdf, name, results_dir)
 
-plot_heatmap.plot_heatmap('UF', UF_out_aggr_wdf, name, results_dir, outgoing=True)
-plot_heatmap.plot_heatmap('UF', UF_in_aggr_wdf, name, results_dir, outgoing=False)
+## Targets/ Incoming ##
+UF_in_aggr_wdf = in_infl_wdf[['actors', '*_UF', 'UF_UF', 'TF_UF', 'UM_UF', 'TM_UF']]
+UF_in_aggr_wdf = UF_in_aggr_wdf.loc[UF_in_aggr_wdf['*_UF'] !=0]
+UF_in_aggr_wdf = UF_in_aggr_wdf.sort_values(by=['*_UF'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_indegree('UF', UF_in_aggr_wdf, name, results_dir)
 
 
 
 ######## TF #########
-TF_in_aggr_wdf = in_infl_wdf[['actors', 'TF_*', 'TF_UM', 'TF_UF', 'TF_TM', 'TF_TF']]
-TF_out_aggr_wdf = out_infl_wdf[['actors', 'TF_*', 'TF_UM', 'TF_UF', 'TF_TM', 'TF_TF']]
-TF_in_aggr_wdf = TF_in_aggr_wdf.loc[TF_in_aggr_wdf['TF_*'] !=0]
+## Sources/ Outgoing ##
+TF_out_aggr_wdf = out_infl_wdf[['actors', 'TF_*', 'TF_TF', 'TF_UF', 'TF_TM', 'TF_UM']]
 TF_out_aggr_wdf = TF_out_aggr_wdf.loc[TF_out_aggr_wdf['TF_*'] !=0]
-
 TF_out_aggr_wdf = TF_out_aggr_wdf.sort_values(by=['TF_*'], ascending=False).dropna()
-TF_in_aggr_wdf = TF_in_aggr_wdf.sort_values(by=['TF_*'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_outdegree('TF', TF_out_aggr_wdf, name, results_dir)
 
-plot_heatmap.plot_heatmap('TF', TF_out_aggr_wdf, name, results_dir, outgoing=True)
-plot_heatmap.plot_heatmap('TF', TF_in_aggr_wdf, name, results_dir, outgoing=False)
+## Targets/ Incoming ##
+TF_in_aggr_wdf = in_infl_wdf[['actors', '*_TF', 'TF_TF', 'UF_TF', 'TM_TF', 'UM_TF']]
+TF_in_aggr_wdf = TF_in_aggr_wdf.loc[TF_in_aggr_wdf['*_TF'] !=0]
+TF_in_aggr_wdf = TF_in_aggr_wdf.sort_values(by=['*_TF'], ascending=False).dropna()
+plot_heatmap.plot_heatmap_indegree('TF', TF_in_aggr_wdf, name, results_dir)
 
 
 
@@ -134,7 +134,7 @@ part_df = part_df[ \
             ]
 
 
-part_df.to_csv(f'results/{dataset}_out_part_coef.csv')
+part_df.to_csv(f'multilayer-network/results/{dataset}_out_part_coef.csv')
 
 
 
