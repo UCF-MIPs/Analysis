@@ -11,7 +11,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import seaborn as sns
 from src import plot_heatmap
+from src import plot_participant_coef
 
 pd.set_option('display.max_rows', None)
 #pd.set_option('display.max_columns', None)
@@ -89,10 +91,9 @@ TF_in_aggr_wdf = TF_in_aggr_wdf.loc[TF_in_aggr_wdf['*_TF'] !=0]
 TF_in_aggr_wdf = TF_in_aggr_wdf.sort_values(by=['*_TF'], ascending=False).dropna()
 plot_heatmap.plot_heatmap_indegree('TF', TF_in_aggr_wdf, name, results_dir)
 
-
-
-
-# participation coefficient
+#################################
+### participation coefficient ###
+#################################
 
 def part_coeff(df, sour_infl):
     # probably should include actors and go row by row
@@ -106,7 +107,7 @@ def part_coeff(df, sour_infl):
         infl_type = str(sour_infl + '_' + i)
         print(infl_type)
         k = df[infl_type].to_numpy()
-        #print(np.count_nonzero(o)) 
+        #print(np.count_nonzero(o))
         #ptemp += np.divide(k,o,out=np.zeros_like(k), where=o!=0, dtype=float)**2
         ptemp += np.divide(k,o)**2
         #print(ptemp)
@@ -136,7 +137,56 @@ part_df = part_df[ \
 
 part_df.to_csv(f'multilayer-network/results/{dataset}_out_part_coef.csv')
 
+### new participant coefficient functions ###
+## Sources/outdegree ##
+def part_coef_out(df, inf, layers):
+    types = ['UM','TM','UF','TF']
+    aggr_type = str(inf + '_*')
+    df['ptemp'] = 0
+    for i in types:
+        infl_type = str(inf + '_' + i)
+        df['ptemp'] += np.power(np.divide(df[infl_type],df[aggr_type]),2)
+    df['pc_out'] = (layers/(layers-1))*(1-df['ptemp'])
+    return df 
 
+## Targets/Incoming ##
+def part_coef_in(df, inf, layers):
+    types = ['UM','TM','UF','TF']
+    aggr_type = str('*_' + inf)
+    df['ptemp'] = 0
+    for i in types:
+        infl_type = str(i + '_' + inf)
+        df['ptemp'] += np.power(np.divide(df[infl_type],df[aggr_type]),2)
+    df['pc_in'] = (layers/(layers-1))*(1-df['ptemp'])
+    return df 
+
+## Creating Plots for Participant Coefficient of Sources ##
+part_coef_out(UM_out_aggr_wdf,'UM', 4)
+part_coef_out(TM_out_aggr_wdf,'TM', 4)
+part_coef_out(UF_out_aggr_wdf,'UF', 4)
+part_coef_out(TF_out_aggr_wdf,'TF', 4)
+plt.clf()
+plot_participant_coef.part_coef_plot_out('UM', UM_out_aggr_wdf, name, results_dir)
+plt.clf()
+plot_participant_coef.part_coef_plot_out('TM', TM_out_aggr_wdf, name, results_dir)
+plt.clf()
+plot_participant_coef.part_coef_plot_out('UF', UF_out_aggr_wdf, name, results_dir)
+plt.clf()
+plot_participant_coef.part_coef_plot_out('TF', TF_out_aggr_wdf, name, results_dir)
+
+## Creating Plots for Participant Coefficient of Targets ##
+part_coef_in(UM_in_aggr_wdf,'UM', 4)
+part_coef_in(TM_in_aggr_wdf,'TM', 4)
+part_coef_in(UF_in_aggr_wdf,'UF', 4)
+part_coef_in(TF_in_aggr_wdf,'TF', 4)
+plt.clf()
+plot_participant_coef.part_coef_plot_in('UM', UM_in_aggr_wdf, name, results_dir)
+plt.clf()
+plot_participant_coef.part_coef_plot_in('TM', TM_in_aggr_wdf, name, results_dir)
+plt.clf()
+plot_participant_coef.part_coef_plot_in('UF', UF_in_aggr_wdf, name, results_dir)
+plt.clf()
+plot_participant_coef.part_coef_plot_in('TF', TF_in_aggr_wdf, name, results_dir)
 
 
 ### COMPARING ALL AGGREGATES
